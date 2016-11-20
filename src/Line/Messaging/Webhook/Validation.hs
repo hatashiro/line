@@ -1,6 +1,12 @@
+{-|
+This module provides a function to check if a webhook request has a correct
+signature.
+-}
+
 {-# LANGUAGE OverloadedStrings #-}
 
 module Line.Messaging.Webhook.Validation (
+  -- * Signature validation
   validateSignature,
   ) where
 
@@ -17,6 +23,12 @@ getSignature req = lookup "X-Line-Signature" headers
   where
     headers = requestHeaders req
 
+-- | Provided a channel secret, WAI request and request body, it determines
+-- the request is properly signatured, which probably means it is sent
+-- from the LINE server.
+--
+-- For more details of webhook authentication, please refer to
+-- <https://devdocs.line.me/en/#webhook-authentication the LINE documentation>.
 validateSignature :: ChannelSecret -> Request -> BL.ByteString -> Bool
 validateSignature secret req body = case getSignature req of
   Nothing -> False

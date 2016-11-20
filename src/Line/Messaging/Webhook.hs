@@ -1,6 +1,14 @@
+{-|
+This module provides webhook handlers both general and WAI-specific.
+-}
+
 module Line.Messaging.Webhook (
+  -- * Types
+  -- | Re-exported for convenience.
   module Line.Messaging.Webhook.Types,
+  -- * Basic webhook
   webhook,
+  -- * Webhook as a WAI application
   webhookApp,
   defaultOnFailure,
   ) where
@@ -15,6 +23,10 @@ import Line.Messaging.Types (ChannelSecret)
 import Network.HTTP.Types.Status
 import Network.Wai
 
+-- | A basic webhook function. It validates a request with a channel secret,
+-- and parses the request into a list of webhook events.
+--
+-- To handle failures, the result is in the form of @'ExceptT' 'WebhookFailure'@.
 webhook :: ChannelSecret
         -> Request
         -> ExceptT WebhookFailure IO [Event]
@@ -33,9 +45,29 @@ waiResponse result req f = case result of
   WaiResponse res -> f res
   WaiApp app      -> app req f
 
-webhookApp :: ChannelSecret
-           -> ([Event] -> IO WebhookResult)
-           -> (WebhookFailure -> Application)
+-- | A webhook handler for WAI. It uses 'webhook' internally and returns a WAI
+-- 'Application'.
+--
+-- An example webhook server using WAI will be like below:
+--
+-- @
+--   app :: Application
+--   app req f = case pathInfo req of
+--     "webhook" : _ -> do
+--       secret <- getChannelSecret
+--       webhookApp secret handler defaultOnFailure $ req f
+--     _ -> undefined
+--
+--   handler :: [Event] -> IO WebhookResult
+--   handler events = forM_ events handleEvent $> Ok
+--
+--   handleEvent :: Event -> IO ()
+--   handleEvent (MessageEvent event) = undefined -- handle a message event
+--   handleEvent _ = return ()
+-- @
+webhookApp :: ChannelSecret -- ^ A channel secret
+           -> ([Event] -> IO WebhookResult) -- ^ An event handler
+           -> (WebhookFailure -> Application) -- ^ An error handler. Just to return 400 for failures, use 'defaultOnFailure'.
            -> Application
 webhookApp secret handler failHandler req f = do
   result <- runExceptT $ webhook secret req
@@ -43,6 +75,8 @@ webhookApp secret handler failHandler req f = do
     Right events -> handler events >>= waiResponse <*> pure req <*> pure f
     Left exception -> failHandler exception req f
 
+-- | A basic error handler to be used with 'webhookApp'. It returns 400 Bad
+-- Request with the 'WebhookFailure' code for its body.
 defaultOnFailure :: WebhookFailure -> Application
 defaultOnFailure failure _ f = f .
   responseBuilder status400 [] . string8 . show $ failure

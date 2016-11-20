@@ -1,6 +1,13 @@
+{-|
+This module just re-exports other @Types@ modules.
+-}
+
 module Line.Messaging.Types (
-  module Line.Messaging.API.Types,
+  -- * Common types
   module Line.Messaging.Common.Types,
+  -- * API types
+  module Line.Messaging.API.Types,
+  -- * Webhook types
   module Line.Messaging.Webhook.Types,
   ) where
 
