@@ -1,7 +1,21 @@
+{-|
+This module provides functions corresponding to the LINE Messaging APIs, nearly
+one on one.
+
+For more details about the APIs themselves, please refer to the
+<https://devdocs.line.me/en/#messaging-api API references>.
+-}
+
 module Line.Messaging.API (
+  -- * Types
+  -- | Re-exported for convenience.
   module Line.Messaging.API.Types,
+  -- * Monad transformer for APIs
   APIIO,
   runAPI,
+  -- * LINE Messaging APIs
+  -- | Every API call returns its result with @'APIIO'@. About the usage of
+  -- @'APIIO'@, please refer to the previous section.
   push,
   reply,
   getContent,
@@ -25,8 +39,35 @@ import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
 import qualified Network.Wreq as Wr
 
+-- | A monad transformer for API calls. If translated into a human-readable
+-- form, it means:
+--
+-- 1. An API call needs a channel access token to specify through which
+--    channel it should send the call (@'ReaderT' 'ChannelAccessToken'@).
+-- 2. An API call effectfully returns a result if successful, @'APIError'@
+--    otherwise (@'ExceptT' 'APIError'@).
 type APIIO a = ReaderT ChannelAccessToken (ExceptT APIError IO) a
 
+-- | 'runAPI' resolves the 'APIIO' monad transformer, and turns it into a plain
+-- @'IO'@ with @'ChannelAccessToken'@ provided.
+--
+-- The reason the type of the first parameter is not @'ChannelAccessToken'@, but
+-- @'IO' 'ChannelAccessToken'@, is that it is usually loaded via effectful
+-- actions such as parsing command line arguments or reading a config file.
+--
+-- An example usage is like below:
+--
+-- @
+--   api :: APIIO a -> IO (Either APIError a)
+--   api = runAPI getChannelAccessTokenFromConfig
+--
+--   main :: IO ()
+--   main = do
+--     result <- api $ push "some_receiver_id" [ Message $ Text "Hello, world!" ]
+--     case result of
+--       Right _ -> return ()
+--       Left err -> print err
+-- @
 runAPI :: IO ChannelAccessToken -> APIIO a -> IO (Either APIError a)
 runAPI getToken api = getToken >>= runExceptT . runReaderT api
 
@@ -63,6 +104,13 @@ post url body = do
   opts <- getOpts
   runReqIO $ Wr.postWith opts url (toJSON body)
 
+-- | Push messages into a receiver. The receiver can be a user, a room or
+-- a group, and specified by 'ID'.
+--
+-- TBD: about 'Message' type
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#push-message its API reference>.
 push :: ID -> [Message] -> APIIO ()
 push id' ms = do
   let url = "https://api.line.me/v2/bot/message/push"
@@ -71,6 +119,10 @@ push id' ms = do
                          ]
   return ()
 
+-- | Send messages as a reply to specific webhook event. TBD
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#reply-message its API reference>.
 reply :: ReplyToken -> [Message] -> APIIO ()
 reply replyToken ms = do
   let url = "https://api.line.me/v2/bot/message/reply"
@@ -79,6 +131,10 @@ reply replyToken ms = do
                          ]
   return ()
 
+-- | TBD
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#get-content its API reference>.
 getContent :: ID -> APIIO BL.ByteString
 getContent id' = do
   let url = concat [ "https://api.line.me/v2/bot/message/"
@@ -87,6 +143,10 @@ getContent id' = do
                    ]
   get url
 
+-- | TBD
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#bot-api-get-profile its API reference>.
 getProfile :: ID -> APIIO Profile
 getProfile id' = do
   let url = "https://api.line.me/v2/bot/profile/" ++ T.unpack id'
@@ -106,8 +166,16 @@ leave type' id' = do
   _ <- post url ("" :: T.Text)
   return ()
 
+-- | Leave a room, specified by @'ID'@.
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#leave its API reference>.
 leaveRoom :: ID -> APIIO ()
 leaveRoom = leave "room"
 
+-- | Leave a group, specified by @'ID'@.
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#leave its API reference>.
 leaveGroup :: ID -> APIIO ()
 leaveGroup = leave "group"
