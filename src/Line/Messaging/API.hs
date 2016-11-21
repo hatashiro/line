@@ -105,12 +105,28 @@ post url body = do
   runReqIO $ Wr.postWith opts url (toJSON body)
 
 -- | Push messages into a receiver. The receiver can be a user, a room or
--- a group, and specified by 'ID'.
+-- a group, specified by 'ID'.
 --
--- TBD: about 'Message' type
+-- A 'Message' represents a message object. For types of the message object,
+-- please refer to the "<https://devdocs.line.me/en/#send-message-object Send message object>"
+-- section of the LINE documentation.
 --
--- For more information, please refer to
--- <https://devdocs.line.me/en/#push-message its API reference>.
+-- An example usage of 'Message' is like below:
+--
+-- @
+--   messages :: [Message]
+--   messages = [ Message $ 'Image' imageURL previewURL
+--              , Message $ 'Text' "hello, world!"
+--              , Message $ 'Template' "an example template"
+--                  Confirm "a confirm template"
+--                    [ TplMessageAction "ok label" "print this"
+--                    , TplURIAction "link label" linkURL
+--                    ]
+--              ]
+-- @
+--
+-- For more information about the API, please refer to
+-- <https://devdocs.line.me/en/#push-message the API reference>.
 push :: ID -> [Message] -> APIIO ()
 push id' ms = do
   let url = "https://api.line.me/v2/bot/message/push"
@@ -119,7 +135,11 @@ push id' ms = do
                          ]
   return ()
 
--- | Send messages as a reply to specific webhook event. TBD
+-- | Send messages as a reply to specific webhook event.
+--
+-- It works similarly to how 'push' does for messages, except that it can only
+-- reply through a specific reply token. The token can be obtained from
+-- <./Line-Messaging-Webhook-Types.html#t:ReplyableEvent replyable events> on a webhook server.
 --
 -- For more information, please refer to
 -- <https://devdocs.line.me/en/#reply-message its API reference>.
@@ -131,7 +151,12 @@ reply replyToken ms = do
                          ]
   return ()
 
--- | TBD
+-- | Get content body of images, videos and audios sent with
+-- <./Line-Messaging-Webhook-Types.html#t:EventMessage event messages>,
+-- specified by 'ID'.
+--
+-- They are not included in the request body of the event messages, to be
+-- downloaded only when they are really needed.
 --
 -- For more information, please refer to
 -- <https://devdocs.line.me/en/#get-content its API reference>.
@@ -143,7 +168,9 @@ getContent id' = do
                    ]
   get url
 
--- | TBD
+-- | Get a profile of a user, specified by 'ID'.
+--
+-- The user identifier can be obtained via <./Line-Messaging-Webhook-Types.html#t:EventSource EventSource>.
 --
 -- For more information, please refer to
 -- <https://devdocs.line.me/en/#bot-api-get-profile its API reference>.
