@@ -1,11 +1,29 @@
+{-|
+This module provides types to be used with "Line.Messaging.Webhook".
+-}
+
 module Line.Messaging.Webhook.Types (
+  -- * Common types
+  -- | Re-exported for convenience.
   module Line.Messaging.Common.Types,
+  -- * Result and failure
   WebhookResult (..),
   WebhookFailure (..),
-  ReplyToken,
+
+  -- * Webhook request body
+  -- | The following types and functions are about decoding a webhook request body.
+
+  -- ** Body
   Body (..),
+  -- ** Event
+  -- | The webhook event data types and the instances for proper type classes
+  -- (e.g. 'FromJSON') are implemented here.
+  --
+  -- For the event spec, please refer to
+  -- <https://devdocs.line.me/en/#webhook-event-object the LINE documentation>.
   Event (..),
   EventTuple,
+  ReplyToken,
   ReplyableEvent,
   NonReplyableEvent,
   getSource,
@@ -14,9 +32,12 @@ module Line.Messaging.Webhook.Types (
   getMessage,
   getPostback,
   getBeacon,
+  -- *** Event source
   EventSource (..),
   getId,
+  -- *** Message event
   EventMessage (..),
+  -- *** Beacon event
   BeaconData (..),
   ) where
 
@@ -28,22 +49,22 @@ import Line.Messaging.Common.Types
 import Network.Wai (Response, Application)
 import qualified Data.Text as T
 
-data WebhookResult = Ok
-                   | WaiResponse Response
-                   | WaiApp Application
+-- | A result type a webhook event handler should return.
+--
+-- It is eventually transformed to a WAI response or application.
+data WebhookResult = Ok -- ^ Respond with an empty 200 OK response.
+                   | WaiResponse Response -- ^ Respond with a WAI response.
+                   | WaiApp Application -- ^ Respond with a WAI application.
 
-data WebhookFailure = SignatureVerificationFailed
-                    | MessageDecodeFailed
+-- | A failure type returned when a webhook request is malformed.
+data WebhookFailure = SignatureVerificationFailed -- ^ When the signature is not valid.
+                    | MessageDecodeFailed -- ^ When the request body cannot be decoded into defined event types.
                     deriving (Eq, Show)
 
-type ReplyToken = T.Text
-
--- The Event data type and instances for proper type classes (e.g. FromJson)
--- should be implemented here.
--- For the Event spec, please refer to the official doc.
+-- | This type represents a whole request body.
 --
--- https://devdocs.line.me/en/#webhook-event-object
-
+-- It is mainly for JSON parsing, and library users may not need to use this
+-- type directly.
 newtype Body = Body [Event]
              deriving (Eq, Show)
 
@@ -51,6 +72,23 @@ instance FromJSON Body where
   parseJSON (Object v) = Body <$> v .: "events"
   parseJSON _ = fail "Body"
 
+-- | A type to represent each webhook event. The type of an event can be
+-- determined with pattern matching.
+--
+-- @
+-- handleEvent :: Event -> IO ()
+-- handleEvent (MessageEvent event) = handleMessageEvent event
+-- handleEvent (BeaconEvent event) = handleBeaconEvent event
+-- handleEvent _ = return ()
+--
+-- handleMessageEvent :: ReplyableEvent EventMessage -> IO ()
+-- handleMessageEvent = undefined
+--
+-- handleBeaconEvent :: ReplyableEvent BeaconData -> IO ()
+-- handleBeaconEvent = undefined
+-- @
+--
+-- All the data contstructors have a type @'EventTuple' r a -> 'Event'@.
 data Event = MessageEvent (ReplyableEvent EventMessage)
            | FollowEvent (ReplyableEvent ())
            | UnfollowEvent (NonReplyableEvent ())
@@ -60,25 +98,72 @@ data Event = MessageEvent (ReplyableEvent EventMessage)
            | BeaconEvent (ReplyableEvent BeaconData)
            deriving (Eq, Show)
 
+-- | The base type for an event. It is a type alias for 4-tuple containing event
+-- data.
+--
+-- The type variable @r@ is for a reply token, which is @()@ in the case of
+-- non-replyable events. The type variable @a@ is a content type, which is
+-- @()@ for events without content.
 type EventTuple r a = (EventSource, UTCTime, r, a)
+
+-- | A type alias for reply token. It is used by the
+-- @<./Line-Messaging-API.html#v:reply reply>@ API.
+type ReplyToken = T.Text
+
+-- | This type alias represents a replyable event.
 type ReplyableEvent a = EventTuple ReplyToken a
+-- | This type alias represents a non-replyable event.
 type NonReplyableEvent a = EventTuple () a
 
+-- | Retrieve event source from an event.
 getSource :: EventTuple r a -> EventSource
 getSource (s, _, _, _) = s
 
+-- | Retrieve datetime when event is sent.
 getDatetime :: EventTuple r a -> UTCTime
 getDatetime (_, t, _, _) = t
 
+-- | Retrieve a reply token of an event. It can be used only for
+-- 'ReplyableEvent'.
 getReplyToken :: ReplyableEvent a -> ReplyToken
 getReplyToken (_, _, r, _) = r
 
+-- | Retrieve event message from an event. It can be used only for events whose
+-- content is a message.
+--
+-- @
+-- handleMessageEvent :: ReplyableEvent EventMessage -> IO ()
+-- handleMessageEvent event = do
+--   let message = getMessage event
+--   print message
+-- @
 getMessage :: ReplyableEvent EventMessage -> EventMessage
 getMessage (_, _, _, m) = m
 
+-- | Retrieve postback data from an event. It can be used only for events whose
+-- content is postback data.
+--
+-- @
+-- import qualified Data.Text as T
+-- import qualified Data.Text.IO as TIO
+--
+-- handlePostbackEvent :: ReplyableEvent T.Text -> IO ()
+-- handlePostbackEvent event = do
+--   let postback = getPostback event
+--   TIO.putStrLn postback
+-- @
 getPostback :: ReplyableEvent T.Text -> T.Text
 getPostback (_, _, _, d) = d
 
+-- | Retrieve beacon data from an event. It can be used only for events whose
+-- content is beacon data.
+--
+-- @
+-- handleBeaconEvent :: ReplyableEvent BeaconData -> IO ()
+-- handleBeaconEvent event = do
+--   let beaconData = getBeacon event
+--   print beaconData
+-- @
 getBeacon :: ReplyableEvent BeaconData -> BeaconData
 getBeacon (_, _, _, b) = b
 
@@ -103,11 +188,13 @@ instance FromJSON Event where
 
   parseJSON _ = fail "Event"
 
+-- | A source from which an event is sent. It can be retrieved with 'getSource'.
 data EventSource = User ID
                  | Group ID
                  | Room ID
                  deriving (Eq, Show)
 
+-- | Retrieve identifier from event source
 getId :: EventSource -> ID
 getId (User i) = i
 getId (Group i) = i
@@ -122,12 +209,22 @@ instance FromJSON EventSource where
       _ -> fail "EventSource"
   parseJSON _ = fail "EventSource"
 
-data EventMessage = TextEM ID Text
-                  | ImageEM ID
-                  | VideoEM ID
-                  | AudioEM ID
-                  | LocationEM ID Location
-                  | StickerEM ID Sticker
+-- | Represent message types sent with 'MessageEvent'. it can be retrieved with
+-- 'getMessage'.
+--
+-- There is no data sent with image, video and audio messages. The actual binary
+-- data can be downloaded via the
+-- @<./Line-Messaging-API.html#v:getContent getContent>@ API.
+--
+-- For more details of event messages, please refer to the
+-- <https://devdocs.line.me/en/#message-event Message event> section of the LINE
+-- documentation.
+data EventMessage = TextEM ID Text -- ^ A text event message.
+                  | ImageEM ID -- ^ An image event message.
+                  | VideoEM ID -- ^ A video event message.
+                  | AudioEM ID -- ^ An audio event message.
+                  | LocationEM ID Location -- ^ A location event message.
+                  | StickerEM ID Sticker -- ^ A sticker event message.
                   deriving (Eq, Show)
 
 instance FromJSON EventMessage where
@@ -142,6 +239,7 @@ instance FromJSON EventMessage where
       _ -> fail "EventMessage"
   parseJSON _ = fail "IncommingMessage"
 
+-- | Represent beacon data.
 data BeaconData = BeaconEnter { getHWID :: ID }
                 deriving (Eq, Show)
 
