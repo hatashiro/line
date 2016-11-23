@@ -58,15 +58,15 @@ type APIIO a = ReaderT ChannelAccessToken (ExceptT APIError IO) a
 -- An example usage is like below:
 --
 -- @
---   api :: APIIO a -> IO (Either APIError a)
---   api = runAPI getChannelAccessTokenFromConfig
+-- api :: APIIO a -> IO (Either APIError a)
+-- api = runAPI getChannelAccessTokenFromConfig
 --
---   main :: IO ()
---   main = do
---     result <- api $ push "some_receiver_id" [ Message $ Text "Hello, world!" ]
---     case result of
---       Right _ -> return ()
---       Left err -> print err
+-- main :: IO ()
+-- main = do
+--   result <- api $ push "some_receiver_id" [ Message $ Text "Hello, world!" ]
+--   case result of
+--     Right _ -> return ()
+--     Left err -> print err
 -- @
 runAPI :: IO ChannelAccessToken -> APIIO a -> IO (Either APIError a)
 runAPI getToken api = getToken >>= runExceptT . runReaderT api
@@ -114,15 +114,15 @@ post url body = do
 -- An example usage of 'Message' is like below:
 --
 -- @
---   messages :: [Message]
---   messages = [ Message $ 'Image' imageURL previewURL
---              , Message $ 'Text' "hello, world!"
---              , Message $ 'Template' "an example template"
---                  Confirm "a confirm template"
---                    [ TplMessageAction "ok label" "print this"
---                    , TplURIAction "link label" linkURL
---                    ]
---              ]
+-- messages :: [Message]
+-- messages = [ Message $ 'Image' imageURL previewURL
+--            , Message $ 'Text' "hello, world!"
+--            , Message $ 'Template' "an example template"
+--                Confirm "a confirm template"
+--                  [ TplMessageAction "ok label" "print this"
+--                  , TplURIAction "link label" linkURL
+--                  ]
+--            ]
 -- @
 --
 -- For more information about the API, please refer to

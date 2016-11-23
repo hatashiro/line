@@ -51,19 +51,19 @@ waiResponse result req f = case result of
 -- An example webhook server using WAI will be like below:
 --
 -- @
---   app :: Application
---   app req f = case pathInfo req of
---     "webhook" : _ -> do
---       secret <- getChannelSecret
---       webhookApp secret handler defaultOnFailure $ req f
---     _ -> undefined
+-- app :: Application
+-- app req f = case pathInfo req of
+--   "webhook" : _ -> do
+--     secret <- getChannelSecret
+--     webhookApp secret handler defaultOnFailure $ req f
+--   _ -> undefined
 --
---   handler :: [Event] -> IO WebhookResult
---   handler events = forM_ events handleEvent $> Ok
+-- handler :: [Event] -> IO WebhookResult
+-- handler events = forM_ events handleEvent $> Ok
 --
---   handleEvent :: Event -> IO ()
---   handleEvent (MessageEvent event) = undefined -- handle a message event
---   handleEvent _ = return ()
+-- handleEvent :: Event -> IO ()
+-- handleEvent (MessageEvent event) = undefined -- handle a message event
+-- handleEvent _ = return ()
 -- @
 webhookApp :: ChannelSecret -- ^ A channel secret
            -> ([Event] -> IO WebhookResult) -- ^ An event handler
