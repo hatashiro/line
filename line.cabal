@@ -1,16 +1,26 @@
 name:                line
 version:             0.1.0.0
 synopsis:            Haskell SDK for the LINE API
-description:         Please see README.md
 homepage:            https://github.com/noraesae/line
 license:             BSD3
 license-file:        LICENSE
 author:              Jun
-maintainer:          me@noraesae.net
-copyright:           MIT
-category:            Web
+maintainer:          Jun <me@noraesae.net>
+copyright:           (c) 2016 Jun <me@noraesae.net>
+category:            Network
 build-type:          Simple
 cabal-version:       >=1.10
+description:
+  This package exports bindings to LINE APIs.
+  .
+  It provides following features:
+  .
+  * Internal auth signature validator
+  * Webhook handled with handler function and WAI application
+  * Functions and types for <https://devdocs.line.me/en/#messaging-api LINE Messaging API>
+  .
+  For example usages, please see the
+  <https://github.com/noraesae/line/tree/master/examples examples> directory.
 
 library
   hs-source-dirs:      src
