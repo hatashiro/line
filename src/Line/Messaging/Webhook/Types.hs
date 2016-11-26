@@ -219,12 +219,12 @@ instance FromJSON EventSource where
 -- For more details of event messages, please refer to the
 -- <https://devdocs.line.me/en/#message-event Message event> section of the LINE
 -- documentation.
-data EventMessage = TextEM ID Text -- ^ A text event message.
-                  | ImageEM ID -- ^ An image event message.
-                  | VideoEM ID -- ^ A video event message.
-                  | AudioEM ID -- ^ An audio event message.
-                  | LocationEM ID Location -- ^ A location event message.
-                  | StickerEM ID Sticker -- ^ A sticker event message.
+data EventMessage = TextEM ID Text -- ^ Text event message.
+                  | ImageEM ID -- ^ Image event message.
+                  | VideoEM ID -- ^ Video event message.
+                  | AudioEM ID -- ^ Audio event message.
+                  | LocationEM ID Location -- ^ Location event message.
+                  | StickerEM ID Sticker -- ^ Sticker event message.
                   deriving (Eq, Show)
 
 instance FromJSON EventMessage where

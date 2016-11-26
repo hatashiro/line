@@ -65,9 +65,9 @@ waiResponse result req f = case result of
 -- handleEvent (MessageEvent event) = undefined -- handle a message event
 -- handleEvent _ = return ()
 -- @
-webhookApp :: ChannelSecret -- ^ A channel secret
-           -> ([Event] -> IO WebhookResult) -- ^ An event handler
-           -> (WebhookFailure -> Application) -- ^ An error handler. Just to return 400 for failures, use 'defaultOnFailure'.
+webhookApp :: ChannelSecret -- ^ Channel secret
+           -> ([Event] -> IO WebhookResult) -- ^ Event handler
+           -> (WebhookFailure -> Application) -- ^ Error handler. Just to return 400 for failures, use 'defaultOnFailure'.
            -> Application
 webhookApp secret handler failHandler req f = do
   result <- runExceptT $ webhook secret req
