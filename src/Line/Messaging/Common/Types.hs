@@ -6,6 +6,7 @@ module Line.Messaging.Common.Types (
   -- * General types
   ID,
   URL,
+  Postback,
   -- * LINE API types
   ChannelSecret,
   ChannelAccessToken,
@@ -17,6 +18,8 @@ import qualified Data.Text as T
 type ID = T.Text
 -- | A type alias to specify a URL.
 type URL = T.Text
+-- | A type alias for postback data.
+type Postback = T.Text
 
 -- | A type alias to specify a channel secret. About issueing and using the
 -- channel secret, please refer to corresponding LINE documentations.

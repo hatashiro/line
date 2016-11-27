@@ -343,7 +343,7 @@ instance ToJSON Column where
 
 type Label = T.Text
 
-data TemplateAction = TplPostbackAction Label T.Text T.Text
+data TemplateAction = TplPostbackAction Label Postback T.Text
                     | TplMessageAction Label T.Text
                     | TplURIAction Label URL
                     deriving (Eq, Show)

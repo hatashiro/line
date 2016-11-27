@@ -94,7 +94,7 @@ data Event = MessageEvent (ReplyableEvent EventMessage)
            | UnfollowEvent (NonReplyableEvent ())
            | JoinEvent (ReplyableEvent ())
            | LeaveEvent (NonReplyableEvent ())
-           | PostbackEvent (ReplyableEvent T.Text)
+           | PostbackEvent (ReplyableEvent Postback)
            | BeaconEvent (ReplyableEvent BeaconData)
            deriving (Eq, Show)
 
@@ -152,7 +152,7 @@ getMessage (_, _, _, m) = m
 --   let postback = getPostback event
 --   TIO.putStrLn postback
 -- @
-getPostback :: ReplyableEvent T.Text -> T.Text
+getPostback :: ReplyableEvent Postback -> Postback
 getPostback (_, _, _, d) = d
 
 -- | Retrieve beacon data from an event. It can be used only for events whose
