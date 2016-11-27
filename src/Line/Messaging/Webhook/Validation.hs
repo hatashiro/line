@@ -25,7 +25,7 @@ getSignature req = lookup "X-Line-Signature" headers
 
 -- | Provided a channel secret, WAI request and request body, it determines
 -- the request is properly signatured, which probably means it is sent
--- from the LINE server.
+-- from a valid LINE server.
 --
 -- For more details of webhook authentication, please refer to
 -- <https://devdocs.line.me/en/#webhook-authentication the LINE documentation>.

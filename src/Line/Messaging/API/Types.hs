@@ -223,7 +223,7 @@ data ImageMap = ImageMap { getBaseImageURL :: URL
                          , getIMAltText :: T.Text
                            -- ^ Alt text for devices not supporting image map
                          , getBaseImageSize :: (Integer, Integer)
-                           -- ^ Image size tuple, (width, height) specifically
+                           -- ^ Image size tuple, (width, height) specifically.
                            -- The width to be set to 1040, the height to be set to
                            -- the value corresponding to a width of 1040.
                          , getIMActions :: [ImageMapAction]
@@ -397,18 +397,19 @@ type Label = T.Text
 
 -- | A data type for possible template actions.
 --
--- Each action represents a button in template message. A button has a label and
--- an action fired by click.
+-- Each action object represents a button in template message. A button has a
+-- label and an actual action fired by click.
 data TemplateAction = TplMessageAction Label T.Text
-                      -- ^ Message action. When clicked, the specified text
-                      -- will be sent into the same chat by a user who clicked.
+                      -- ^ Message action. When clicked, a specified text will
+                      -- be sent into the same room by a user who clicked the
+                      -- button.
                     | TplPostbackAction Label Postback T.Text
-                      -- ^ Postback action. When clicked, the specified text
-                      -- will be sent, and postback data will be sent to a
-                      -- webhook server as a postback event.
+                      -- ^ Postback action. When clicked, a specified text will
+                      -- be sent, and postback data will be sent to webhook
+                      -- server as a postback event.
                     | TplURIAction Label URL
-                      -- ^ URI action. When clicked, a web page with the
-                      -- specified URI will open in the in-app browser.
+                      -- ^ URI action. When clicked, a web page with a specified
+                      -- URI will open in the in-app browser.
                     deriving (Eq, Show)
 
 instance ToJSON TemplateAction where
@@ -470,18 +471,17 @@ data APIError = BadRequest (Maybe APIErrorBody)
               -- ^ 500 Internal Server Error with a parsed error body.
               | UndefinedStatusCode Int BL.ByteString
               -- ^ Caused by status codes other than 200 and listed statuses
-              -- above. With the status code and request body.
+              -- above, with the status code and request body.
               | JSONDecodeError String
-              -- ^ Caused by badly formatted response body from APIs returning
-              -- meaningful data.
+              -- ^ Caused by badly formatted response body from APIs.
               | UndefinedError SomeException
               -- ^ Any other exception caught as 'SomeException'.
               deriving Show
 
 -- | An error body type.
 --
--- It contains an error message, and possibly a property information and more
--- detailed error bodies.
+-- It contains error message, and may contain property information and detailed
+-- error bodies.
 data APIErrorBody = APIErrorBody { getErrorMessage :: T.Text
                                  , getErrorProperty :: Maybe T.Text
                                  , getErrorDetails :: Maybe [APIErrorBody]

@@ -108,7 +108,7 @@ post url body = do
 -- a group, specified by 'ID'.
 --
 -- A 'Message' represents a message object. For types of the message object,
--- please refer to the "<https://devdocs.line.me/en/#send-message-object Send message object>"
+-- please refer to the <https://devdocs.line.me/en/#send-message-object Send message object>
 -- section of the LINE documentation.
 --
 -- An example usage of 'Message' is like below:
@@ -155,8 +155,8 @@ reply replyToken ms = do
 -- <./Line-Messaging-Webhook-Types.html#t:EventMessage event messages>,
 -- specified by 'ID'.
 --
--- They are not included in the request body of the event messages, to be
--- downloaded only when they are really needed.
+-- In the event messages, the content body is not included. Users should use
+-- 'getContent' to downloaded the content only when it is really needed.
 --
 -- For more information, please refer to
 -- <https://devdocs.line.me/en/#get-content its API reference>.

@@ -55,7 +55,7 @@ waiResponse result req f = case result of
 -- app req f = case pathInfo req of
 --   "webhook" : _ -> do
 --     secret <- getChannelSecret
---     webhookApp secret handler defaultOnFailure $ req f
+--     webhookApp secret handler defaultOnFailure req f
 --   _ -> undefined
 --
 -- handler :: [Event] -> IO WebhookResult

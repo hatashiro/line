@@ -16,7 +16,7 @@ module Line.Messaging.Webhook.Types (
   -- ** Body
   Body (..),
   -- ** Event
-  -- | The webhook event data types and the instances for proper type classes
+  -- | Webhook event data types and instances for proper type classes
   -- (e.g. 'FromJSON') are implemented here.
   --
   -- For the event spec, please refer to
@@ -34,7 +34,7 @@ module Line.Messaging.Webhook.Types (
   getBeacon,
   -- *** Event source
   EventSource (..),
-  getId,
+  getID,
   -- *** Message event
   EventMessage (..),
   -- *** Beacon event
@@ -63,8 +63,8 @@ data WebhookFailure = SignatureVerificationFailed -- ^ When the signature is not
 
 -- | This type represents a whole request body.
 --
--- It is mainly for JSON parsing, and library users may not need to use this
--- type directly.
+-- It is mainly for JSON parsing, and users may not need to use this type
+-- directly.
 newtype Body = Body [Event]
              deriving (Eq, Show)
 
@@ -106,13 +106,13 @@ data Event = MessageEvent (ReplyableEvent EventMessage)
 -- @()@ for events without content.
 type EventTuple r a = (EventSource, UTCTime, r, a)
 
--- | A type alias for reply token. It is used by the
+-- | A type alias for reply token. It is also consumed by the
 -- @<./Line-Messaging-API.html#v:reply reply>@ API.
 type ReplyToken = T.Text
 
--- | This type alias represents a replyable event.
+-- | A type alias to represent a replyable event.
 type ReplyableEvent a = EventTuple ReplyToken a
--- | This type alias represents a non-replyable event.
+-- | A type alias to represent a non-replyable event.
 type NonReplyableEvent a = EventTuple () a
 
 -- | Retrieve event source from an event.
@@ -144,10 +144,9 @@ getMessage (_, _, _, m) = m
 -- content is postback data.
 --
 -- @
--- import qualified Data.Text as T
 -- import qualified Data.Text.IO as TIO
 --
--- handlePostbackEvent :: ReplyableEvent T.Text -> IO ()
+-- handlePostbackEvent :: ReplyableEvent Postback -> IO ()
 -- handlePostbackEvent event = do
 --   let postback = getPostback event
 --   TIO.putStrLn postback
@@ -188,17 +187,18 @@ instance FromJSON Event where
 
   parseJSON _ = fail "Event"
 
--- | A source from which an event is sent. It can be retrieved with 'getSource'.
+-- | A source from which an event is sent. It can be retrieved from events with
+-- 'getSource'.
 data EventSource = User ID
                  | Group ID
                  | Room ID
                  deriving (Eq, Show)
 
 -- | Retrieve identifier from event source
-getId :: EventSource -> ID
-getId (User i) = i
-getId (Group i) = i
-getId (Room i) = i
+getID :: EventSource -> ID
+getID (User i) = i
+getID (Group i) = i
+getID (Room i) = i
 
 instance FromJSON EventSource where
   parseJSON (Object v) = v .: "type" >>= \ t ->
@@ -209,11 +209,11 @@ instance FromJSON EventSource where
       _ -> fail "EventSource"
   parseJSON _ = fail "EventSource"
 
--- | Represent message types sent with 'MessageEvent'. it can be retrieved with
--- 'getMessage'.
+-- | Represent message types sent with 'MessageEvent'. It can be retrieved from
+-- message events with 'getMessage'.
 --
--- There is no data sent with image, video and audio messages. The actual binary
--- data can be downloaded via the
+-- There is no actual content body sent with image, video and audio
+-- messages. It should be manually downloaded via the
 -- @<./Line-Messaging-API.html#v:getContent getContent>@ API.
 --
 -- For more details of event messages, please refer to the
@@ -240,7 +240,9 @@ instance FromJSON EventMessage where
   parseJSON _ = fail "IncommingMessage"
 
 -- | Represent beacon data.
-data BeaconData = BeaconEnter { getHWID :: ID }
+data BeaconData = BeaconEnter { getHWID :: ID
+                                -- ^ Get hardware ID of the beacon.
+                              }
                 deriving (Eq, Show)
 
 instance FromJSON BeaconData where
