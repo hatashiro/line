@@ -1,6 +1,20 @@
-# Haskell SDK for the LINE API
+# line
 
-Under construction: [TODOs](https://github.com/noraesae/line/issues/1)
+Haskell SDK for the LINE API
+
+## Features
+
+* Internal [auth signature validator](https://devdocs.line.me/en/#webhook-authentication)
+* Webhook handled with handler function or [WAI](https://hackage.haskell.org/package/wai) application
+* Functions and types for [LINE Messaging API](https://devdocs.line.me/en/#messaging-api)
+
+## Documentation
+
+Please refer to [the API docs available on Hackage](https://hackage.haskell.org/package/line).
+
+## Examples
+
+Please see the [examples](examples) directory.
 
 ## LICENSE
 
