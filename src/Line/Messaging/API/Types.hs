@@ -219,15 +219,15 @@ instance Messageable Sticker where
 -- refer to
 -- <https://devdocs.line.me/en/#imagemap-message image map message spec>.
 data ImageMap = ImageMap { getBaseImageURL :: URL
-                           -- ^ A <https://devdocs.line.me/en/#base-url base URL> of images.
+                           -- ^ <https://devdocs.line.me/en/#base-url Base URL> of images
                          , getIMAltText :: T.Text
-                           -- ^ An alt text for devices not supporting image map.
+                           -- ^ Alt text for devices not supporting image map
                          , getBaseImageSize :: (Integer, Integer)
-                           -- ^ An image size tuple, (width, height) specifically.
+                           -- ^ Image size tuple, (width, height) specifically
                            -- The width to be set to 1040, the height to be set to
                            -- the value corresponding to a width of 1040.
                          , getIMActions :: [ImageMapAction]
-                           -- ^ Actions to be executed when each area is tapped.
+                           -- ^ Actions to be executed when each area is tapped
                          }
                 deriving (Eq, Show)
 
@@ -268,8 +268,19 @@ type ImageMapArea = (Integer, Integer, Integer, Integer)
 toAreaJSON :: ImageMapArea -> Value
 toAreaJSON (x, y, w, h) = object [ "x" .= x, "y" .= y, "width" .= w, "height" .= h ]
 
+-- | 'Messageable' for template data.
+--
+-- It has a type parameter @t@ which means a template content type. The type is
+-- polymolphic, but 'Messageable' instances are defined only for 'Buttons',
+-- 'Confirm', and 'Carousel'.
+--
+-- About how to send template message and what each field means, please
+-- refer to
+-- <https://devdocs.line.me/en/#template-messages template message spec>.
 data Template t = Template { getTemplateAltText :: T.Text
+                             -- ^ Alt text for devices not supporting template message
                            , getTemplate :: t
+                             -- ^ Template content type
                            }
                   deriving (Eq, Show)
 
@@ -293,10 +304,22 @@ instance Messageable (Template Carousel) where
   toType = templateType
   toObject = templateToObject
 
+-- | The buttons content type for template message.
+--
+-- <<https://devdocs.line.me/images/buttons.png Buttons template>>
+--
+-- For more details of each field, please refer to the
+-- <https://devdocs.line.me/en/#buttons Buttons> section in the LINE
+-- documentation.
 data Buttons = Buttons { getButtonsThumbnailURL :: URL
+                       -- ^ URL for thumbnail image
                        , getButtonsTitle :: T.Text
+                       -- ^ Title text
                        , getButtonsText :: T.Text
+                       -- ^ Description text
                        , getButtonsActions :: [TemplateAction]
+                       -- ^ A list of template actions, each of which represents
+                       -- a button (max: 4)
                        }
                deriving (Eq, Show)
 
@@ -308,8 +331,18 @@ instance ToJSON Buttons where
                                                    , "actions" .= toJSON actions
                                                    ]
 
+-- | The confirm content type for template message.
+--
+-- <<https://devdocs.line.me/images/confirm.png Confirm template>>
+--
+-- For more details of each field, please refer to the
+-- <https://devdocs.line.me/en/#confirm Confirm> section in the LINE
+-- documentation.
 data Confirm = Confirm { getConfirmText :: T.Text
+                       -- ^ Confirm text
                        , getConfirmActions :: [TemplateAction]
+                       -- ^ A list of template actions, each of which represents
+                       -- a button (max: 2)
                        }
                deriving (Eq, Show)
 
@@ -319,7 +352,16 @@ instance ToJSON Confirm where
                                          , "actions" .= toJSON actions
                                          ]
 
-data Carousel = Carousel { getColumns :: [Column] }
+-- | The carousel content type for template message.
+--
+-- <<https://devdocs.line.me/images/carousel.png Carousel template>>
+--
+-- For more details of each field, please refer to the
+-- <https://devdocs.line.me/en/#carousel Carousel> section in the LINE
+-- documentation.
+data Carousel = Carousel { getColumns :: [Column]
+                         -- ^ A list of columns for a carousel template
+                         }
               deriving (Eq, Show)
 
 instance ToJSON Carousel where
@@ -327,10 +369,19 @@ instance ToJSON Carousel where
                                      , "columns" .= toJSON columns
                                      ]
 
+-- | Actual contents of carousel template.
+--
+-- It has the same fields as 'Buttons', except that the number of actions is
+-- up to 3.
 data Column = Column { getColumnThumbnailURL :: URL
+                     -- ^ URL for thumbnail image
                      , getColumnTitle :: T.Text
+                     -- ^ Title text
                      , getColumnText :: T.Text
+                     -- ^ Description text
                      , getColumnActions :: [TemplateAction]
+                     -- ^ A list of template actions, each of which represents
+                     -- a button (max: 3)
                      }
               deriving (Eq, Show)
 
@@ -341,11 +392,23 @@ instance ToJSON Column where
                                                   , "actions" .= toJSON actions
                                                   ]
 
+-- | Just a type alias for 'T.Text', used with 'TemplateAction'.
 type Label = T.Text
 
-data TemplateAction = TplPostbackAction Label Postback T.Text
-                    | TplMessageAction Label T.Text
+-- | A data type for possible template actions.
+--
+-- Each action represents a button in template message. A button has a label and
+-- an action fired by click.
+data TemplateAction = TplMessageAction Label T.Text
+                      -- ^ Message action. When clicked, the specified text
+                      -- will be sent into the same chat by a user who clicked.
+                    | TplPostbackAction Label Postback T.Text
+                      -- ^ Postback action. When clicked, the specified text
+                      -- will be sent, and postback data will be sent to a
+                      -- webhook server as a postback event.
                     | TplURIAction Label URL
+                      -- ^ URI action. When clicked, a web page with the
+                      -- specified URI will open in the in-app browser.
                     deriving (Eq, Show)
 
 instance ToJSON TemplateAction where
