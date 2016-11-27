@@ -16,7 +16,9 @@ description:
   It provides the following features:
   .
   * Internal auth signature validator
+  .
   * Webhook handled with handler function or WAI application
+  .
   * Functions and types for <https://devdocs.line.me/en/#messaging-api LINE Messaging API>
   .
   For example usages, please see the
