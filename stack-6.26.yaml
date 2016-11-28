@@ -1,0 +1,7 @@
+resolver: lts-6.26
+packages:
+- '.'
+extra-deps:
+- cryptohash-sha256-0.11.100.1
+flags: {}
+extra-package-dbs: []
