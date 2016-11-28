@@ -33,7 +33,7 @@ import Control.Monad.Trans.Except (runExceptT, ExceptT, throwE, catchE)
 import Data.Aeson (ToJSON(..), (.=), object, decode', eitherDecode')
 import Data.Text.Encoding (encodeUtf8)
 import Line.Messaging.API.Types
-import Line.Messaging.Types (ChannelAccessToken, ReplyToken)
+import Line.Messaging.Types (ReplyToken)
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T

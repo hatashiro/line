@@ -19,7 +19,6 @@ import Data.Aeson (decode')
 import Data.ByteString.Builder (string8)
 import Line.Messaging.Webhook.Types
 import Line.Messaging.Webhook.Validation (validateSignature)
-import Line.Messaging.Types (ChannelSecret)
 import Network.HTTP.Types.Status
 import Network.Wai
 
