@@ -1,5 +1,5 @@
 name:                line
-version:             1.0.0.1
+version:             1.0.1.0
 synopsis:            Haskell SDK for the LINE API
 homepage:            https://github.com/noraesae/line
 license:             BSD3
