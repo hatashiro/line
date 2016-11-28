@@ -1,6 +1,6 @@
 # line
 
-Haskell SDK for the LINE API
+Haskell SDK for the [LINE](https://line.me) API
 
 ## Features
 
