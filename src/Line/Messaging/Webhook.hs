@@ -20,7 +20,6 @@ import Line.Messaging.Webhook.Types
 import Line.Messaging.Webhook.Validation (validateSignature)
 import Network.HTTP.Types.Status
 import Network.Wai
-import Web.Scotty (ActionM)
 import qualified Data.ByteString.Lazy as BL
 
 -- | A basic webhook function. It validates a request with a channel secret,
