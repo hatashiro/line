@@ -61,7 +61,6 @@ test-suite line-test
                      , quickcheck-instances
                      , text
                      , bytestring
-                     , wai
                      , cryptohash-sha256
                      , base64-bytestring
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N

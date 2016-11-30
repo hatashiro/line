@@ -6,6 +6,8 @@ module Line.Messaging.Webhook.Types (
   -- * Common types
   -- | Re-exported for convenience.
   module Line.Messaging.Common.Types,
+  -- * Validation
+  Signature,
   -- * Result and failure
   WebhookResult (..),
   WebhookFailure (..),
@@ -48,6 +50,12 @@ import Line.Messaging.API.Types
 import Line.Messaging.Common.Types
 import Network.Wai (Response, Application)
 import qualified Data.Text as T
+import qualified Data.ByteString as B
+
+-- | A type alias for auth signature.
+--
+-- It is set as @X-Line-Signature@ header in webhook requests
+type Signature = B.ByteString
 
 -- | A result type a webhook event handler should return.
 --
