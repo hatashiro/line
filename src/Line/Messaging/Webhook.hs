@@ -42,12 +42,6 @@ webhook secret body sig = do
 getSigFromWaiReq :: Request -> Maybe Signature
 getSigFromWaiReq = lookup "X-Line-Signature" . requestHeaders
 
-waiResponse :: WebhookResult -> Application
-waiResponse result req f = case result of
-  Ok              -> f $ responseBuilder status200 [] ""
-  WaiResponse res -> f res
-  WaiApp app      -> app req f
-
 -- | A webhook handler for WAI. It uses 'webhook' internally and returns a WAI
 -- 'Application'.
 --
@@ -61,16 +55,17 @@ waiResponse result req f = case result of
 --     webhookApp secret handler defaultOnFailure req f
 --   _ -> undefined
 --
--- handler :: [Event] -> IO WebhookResult
--- handler events = forM_ events handleEvent $> Ok
+-- handler :: [Event] -> IO ()
+-- handler events = forM_ events handleEvent
 --
 -- handleEvent :: Event -> IO ()
 -- handleEvent (MessageEvent event) = undefined -- handle a message event
 -- handleEvent _ = return ()
 -- @
 webhookApp :: ChannelSecret -- ^ Channel secret
-           -> ([Event] -> IO WebhookResult) -- ^ Event handler
-           -> (WebhookFailure -> Application) -- ^ Error handler. Just to return 400 for failures, use 'defaultOnFailure'.
+           -> ([Event] -> IO ()) -- ^ Event handler
+           -> (WebhookFailure -> Application)
+              -- ^ Error handler. Just to return 400 for failures, use 'defaultOnFailure'.
            -> Application
 webhookApp secret handler failHandler req f = do
   body <- lazyRequestBody req
@@ -80,7 +75,7 @@ webhookApp secret handler failHandler req f = do
     Just sig -> do
       result <- runExceptT $ webhook secret body sig
       case result of
-        Right events -> handler events >>= waiResponse <*> pure req <*> pure f
+        Right events -> handler events >> (f $ responseBuilder status200 [] "")
         Left exception -> failHandler exception req f
 
 -- | A basic error handler to be used with 'webhookApp'. It returns 400 Bad

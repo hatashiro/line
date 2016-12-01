@@ -9,7 +9,6 @@ module Line.Messaging.Webhook.Types (
   -- * Validation
   Signature,
   -- * Result and failure
-  WebhookResult (..),
   WebhookFailure (..),
 
   -- * Webhook request body
@@ -48,7 +47,6 @@ import Data.Time.Clock (UTCTime)
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Line.Messaging.API.Types
 import Line.Messaging.Common.Types
-import Network.Wai (Response, Application)
 import qualified Data.Text as T
 import qualified Data.ByteString as B
 
@@ -56,13 +54,6 @@ import qualified Data.ByteString as B
 --
 -- It is set as @X-Line-Signature@ header in webhook requests
 type Signature = B.ByteString
-
--- | A result type a webhook event handler should return.
---
--- It is eventually transformed to a WAI response or application.
-data WebhookResult = Ok -- ^ Respond with an empty 200 OK response.
-                   | WaiResponse Response -- ^ Respond with a WAI response.
-                   | WaiApp Application -- ^ Respond with a WAI application.
 
 -- | A failure type returned when a webhook request is malformed.
 data WebhookFailure = SignatureVerificationFailed -- ^ When the signature is not valid.

@@ -42,7 +42,7 @@ spec = do
       result `shouldBe` Left MessageDecodeFailed
 
   describe "WAI webhook" $
-    let waiApp = return $ webhookApp "some-secret" (const $ return Ok) defaultOnFailure
+    let waiApp = return $ webhookApp "some-secret" (const $ return ()) defaultOnFailure
         webhookReq sec body hasCorrectSig = request "GET" "/" headers body
           where
             sig = if hasCorrectSig then createSig sec body else "wrong sig"
