@@ -5,10 +5,9 @@ message webhooks.
 
 {-# LANGUAGE OverloadedStrings #-}
 
-module Webhook where
+module WAIWebhook where
 
 import Control.Monad (forM_)
-import Data.Functor (($>))
 import Line.Messaging.Webhook
 import Line.Messaging.Types (Text(..), Location(..))
 import Network.Wai
@@ -32,8 +31,8 @@ app req f = do
 -- A webhook request can contain several events at once, so the first argument
 -- is a list of 'Event's. The function just call the event handler for each
 -- event.
-handler :: [Event] -> IO WebhookResult
-handler events = forM_ events handleEvent $> Ok
+handler :: [Event] -> IO ()
+handler events = forM_ events handleEvent
 
 -- | A function to handle each event.
 --
