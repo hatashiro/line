@@ -10,6 +10,7 @@ import Data.Text.Encoding (encodeUtf8)
 import Line.Messaging.Webhook
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Base64 as Base64
+import qualified Web.Scotty as Scotty
 
 emptyBody :: BL.ByteString
 emptyBody = "{ \"events\": [] }"
@@ -43,6 +44,25 @@ spec = do
 
   describe "WAI webhook" $
     let waiApp = return $ webhookApp "some-secret" (const $ return ()) defaultOnFailure
+        webhookReq sec body hasCorrectSig = request "GET" "/" headers body
+          where
+            sig = if hasCorrectSig then createSig sec body else "wrong sig"
+            headers = [ ("X-Line-Signature", sig) ]
+    in with waiApp $ do
+      it "handle req well" $ do
+        webhookReq "some-secret" emptyBody True `shouldRespondWith` 200
+
+      it "with wrong sig" $ do
+        webhookReq "some-secret" emptyBody False `shouldRespondWith`
+          "SignatureVerificationFailed" { matchStatus = 400 }
+
+      it "malformed body" $ do
+        webhookReq "some-secret" wrongBody True `shouldRespondWith`
+          "MessageDecodeFailed" { matchStatus = 400 }
+
+  describe "Scotty webhook" $
+    let waiApp = Scotty.scottyApp $
+          Scotty.get "/" $ webhookAction "some-secret" (const $ return ()) defaultOnFailure'
         webhookReq sec body hasCorrectSig = request "GET" "/" headers body
           where
             sig = if hasCorrectSig then createSig sec body else "wrong sig"

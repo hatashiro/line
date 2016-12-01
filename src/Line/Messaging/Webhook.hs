@@ -11,16 +11,23 @@ module Line.Messaging.Webhook (
   -- * Webhook as a WAI application
   webhookApp,
   defaultOnFailure,
+  -- * Webhook as a Scotty action
+  webhookAction,
+  defaultOnFailure',
   ) where
 
+import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Trans.Except (ExceptT, throwE, runExceptT)
 import Data.Aeson (decode')
 import Data.ByteString.Builder (string8)
+import Data.Text.Encoding (encodeUtf8)
 import Line.Messaging.Webhook.Types
 import Line.Messaging.Webhook.Validation (validateSignature)
 import Network.HTTP.Types.Status
 import Network.Wai
+import qualified Data.Text.Lazy as TL
 import qualified Data.ByteString.Lazy as BL
+import qualified Web.Scotty as Scotty
 
 -- | A basic webhook function. It validates a request with a channel secret,
 -- signature and body, and parses the body into a list of webhook events.
@@ -83,3 +90,44 @@ webhookApp secret handler failHandler req f = do
 defaultOnFailure :: WebhookFailure -> Application
 defaultOnFailure failure _ f = f .
   responseBuilder status400 [] . string8 . show $ failure
+
+-- | A webhook handler for Scotty. It uses 'webhook' internally and returns a
+-- Scotty action of type 'ActionM' @()@
+--
+-- An example webhook server using WAI will be like below:
+--
+-- @
+-- main :: IO ()
+-- main = scotty 3000 $ do
+--   get "/webhook" $ webhookAction handler defaultOnFailure'
+--
+-- handler :: [Event] -> IO ()
+-- handler events = forM_ events handleEvent
+--
+-- handleEvent :: Event -> IO ()
+-- handleEvent (MessageEvent event) = undefined -- handle a message event
+-- handleEvent _ = return ()
+-- @
+webhookAction :: ChannelSecret -- ^ Channel secret
+              -> ([Event] -> IO ()) -- ^ Event handler
+              -> (WebhookFailure -> Scotty.ActionM ())
+                 -- ^ Error handler. Just to return 400 for failures, use 'defaultOnFailure''.
+              -> Scotty.ActionM ()
+webhookAction secret handler failHandler = do
+  body <- Scotty.body
+  maybeSig <- Scotty.header "X-Line-Signature"
+  case maybeSig of
+    Nothing -> failHandler SignatureVerificationFailed
+    Just sig -> do
+      result <- runExceptT $ webhook secret body (encodeUtf8 $ TL.toStrict sig)
+      case result of
+        Right events -> (liftIO $ handler events) >> Scotty.text ""
+        Left exception -> failHandler exception
+
+-- | A basic error handler to be used with 'webhookAction'. It returns 400 Bad
+-- Request with the 'WebhookFailure' code for its body. It has the same purpose
+-- as 'defaultOnFailure', except that it is for Scotty.
+defaultOnFailure' :: WebhookFailure -> Scotty.ActionM ()
+defaultOnFailure' err = do
+  Scotty.status status400
+  Scotty.text . TL.pack . show $ err
