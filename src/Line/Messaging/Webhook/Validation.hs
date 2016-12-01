@@ -16,9 +16,9 @@ import Line.Messaging.Types
 import qualified Data.ByteString.Base64 as Base64
 import qualified Data.ByteString.Lazy as BL
 
--- | Provided a channel secret, WAI request and request body, it determines
--- the request is properly signatured, which probably means it is sent
--- from a valid LINE server.
+-- | Provided a channel secret, request body and auth signature, it determines
+-- the request is properly signatured, which probably means it is sent from a
+-- valid LINE server.
 --
 -- For more details of webhook authentication, please refer to
 -- <https://devdocs.line.me/en/#webhook-authentication the LINE documentation>.
