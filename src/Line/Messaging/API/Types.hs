@@ -486,7 +486,7 @@ data APIErrorBody = APIErrorBody { getErrorMessage :: T.Text
                                  , getErrorProperty :: Maybe T.Text
                                  , getErrorDetails :: Maybe [APIErrorBody]
                                  }
-                  deriving Show
+                  deriving (Eq, Show)
 
 instance FromJSON APIErrorBody where
   parseJSON (Object v) = APIErrorBody <$> v .: "message"
