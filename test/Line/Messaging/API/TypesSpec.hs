@@ -5,9 +5,12 @@ import Test.Hspec
 import Line.Messaging.API.TypesSpecHelper
 
 import Data.Aeson
+import Data.Aeson.Types
 import Data.Maybe (isJust)
 import Line.Messaging.API.Types
+import Text.RawString.QQ
 import qualified Data.ByteString.Lazy as BL
+import qualified Data.Text as T
 
 fromJSONSpec :: (FromJSON a, Eq a, Show a)
              => [(BL.ByteString, Maybe a)]
@@ -18,8 +21,23 @@ fromJSONSpec ((raw, result):xs) = do
   fromJSONSpec xs
 fromJSONSpec [] = return ()
 
+messageableSpec :: (Messageable a, Eq a, Show a)
+                => String
+                -> a
+                -> [Pair]
+                -> SpecWith ()
+messageableSpec testTitle a result =
+  it testTitle $ toJSON (Message a) `shouldBe` object result
+
 spec :: Spec
 spec = do
+  describe "messageables" $ do
+    messageableSpec "text"
+      (Text "hello")
+      [ "type" .= ("text" :: T.Text)
+      , "text" .= ("hello" :: T.Text)
+      ]
+
   describe "JSON decode" $ do
     describe "profile" $ fromJSONSpec
       [ ( fullProfile, Just $ Profile
