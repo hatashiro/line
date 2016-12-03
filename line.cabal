@@ -55,7 +55,9 @@ test-suite line-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Line.Messaging.WebhookSpec
+  other-modules:       Line.Messaging.API.TypesSpec
+                       Line.Messaging.API.TypesSpecHelper
+                       Line.Messaging.WebhookSpec
                        Line.Messaging.Webhook.TypesSpec
                        Line.Messaging.Webhook.TypesSpecHelper
                        Line.Messaging.Webhook.ValidationSpec
