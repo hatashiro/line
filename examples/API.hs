@@ -63,8 +63,8 @@ pushTemplate identifier (Location _ address _ _) = do
   api $ push identifier [
     Message . Text $ "Here are some restaurants around the location.",
     Message . Template "Alt text for old clients" $
-      Buttons thumbnail name description [
-        TplPostbackAction "Reservation" "Reserved!" name,
+      Buttons (Just thumbnail) (Just name) description [
+        TplPostbackAction "Reservation" "Reserved!" (Just name),
         TplURIAction "Homepage" homepage
         ]
     ]
