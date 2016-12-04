@@ -6,9 +6,8 @@ import Line.Messaging.API.TypesSpecHelper
 
 import Data.Aeson
 import Data.Aeson.Types
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromJust)
 import Line.Messaging.API.Types
-import Text.RawString.QQ
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
 
@@ -24,19 +23,80 @@ fromJSONSpec [] = return ()
 messageableSpec :: (Messageable a, Eq a, Show a)
                 => String
                 -> a
-                -> [Pair]
+                -> BL.ByteString
                 -> SpecWith ()
 messageableSpec testTitle a result =
-  it testTitle $ toJSON (Message a) `shouldBe` object result
+  it testTitle $ toJSON (Message a) `shouldBe` fromJust (decode result)
 
 spec :: Spec
 spec = do
   describe "messageables" $ do
     messageableSpec "text"
-      (Text "hello")
-      [ "type" .= ("text" :: T.Text)
-      , "text" .= ("hello" :: T.Text)
-      ]
+      (Text "Hello, world")
+      textMessageableResult
+
+    messageableSpec "image"
+      (Image "https://example.com/original.jpg" "https://example.com/preview.jpg")
+      imageMessageableResult
+
+    messageableSpec "video"
+      (Video "https://example.com/original.mp4" "https://example.com/preview.jpg")
+      videoMessageableResult
+
+    messageableSpec "audio"
+      (Audio "https://example.com/original.m4a" 240000)
+      audioMessageableResult
+
+    messageableSpec "location"
+      (Location "my location" "some address" 35.65910807942215 139.70372892916203)
+      locationMessageableResult
+
+    messageableSpec "sticker"
+      (Sticker "1" "1")
+      stickerMessageableResult
+
+    messageableSpec "imagemap"
+      (ImageMap "https://example.com/bot/images/rm001" "this is an imagemap" (1040, 1040)
+       [ IMURIAction "https://example.com/" (0, 0, 520, 1040)
+       , IMMessageAction "hello" (520, 0, 520, 1040)
+       ])
+      imageMapMessageableResult
+
+    messageableSpec "template buttons"
+      (Template "this is a buttons template" $
+       Buttons (Just "https://example.com/bot/images/image.jpg") (Just "Menu") "Please select"
+       [ TplPostbackAction "Buy" "action=buy&itemid=123" Nothing
+       , TplPostbackAction "Add to cart" "action=add&itemid=123" Nothing
+       , TplURIAction "View detail" "http://example.com/page/123"
+       ])
+      buttonsTemplateMessageableResult
+
+    messageableSpec "template confirm"
+      (Template "this is a confirm template" $
+       Confirm "Are you sure?"
+       [ TplMessageAction "Yes" "yes"
+       , TplMessageAction "No" "no"
+       ])
+      confirmTemplateMessageableResult
+
+    messageableSpec "template carousel"
+      (Template "this is a carousel template" $
+       Carousel [ Column (Just "https://example.com/bot/images/item1.jpg")
+                         (Just "this is menu")
+                         "description"
+                         [ TplPostbackAction "Buy" "action=buy&itemid=111" Nothing
+                         , TplPostbackAction "Add to cart" "action=add&itemid=111" Nothing
+                         , TplURIAction "View detail" "http://example.com/page/111"
+                         ]
+                , Column (Just "https://example.com/bot/images/item2.jpg")
+                         (Just "this is menu")
+                         "description"
+                         [ TplPostbackAction "Buy" "action=buy&itemid=222" Nothing
+                         , TplPostbackAction "Add to cart" "action=add&itemid=222" Nothing
+                         , TplURIAction "View detail" "http://example.com/page/222"
+                         ]
+                ])
+      carouselTemplateMessageableResult
 
   describe "JSON decode" $ do
     describe "profile" $ fromJSONSpec
