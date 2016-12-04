@@ -5,7 +5,8 @@ Haskell SDK for the [LINE](https://line.me) API
 ## Features
 
 * Internal [auth signature validator](https://devdocs.line.me/en/#webhook-authentication)
-* Webhook handled with handler function or [WAI](https://hackage.haskell.org/package/wai) application
+* Webhook handled with handler function, [WAI](https://hackage.haskell.org/package/wai) application,
+  or [Scotty](https://hackage.haskell.org/package/scotty) action
 * Functions and types for [LINE Messaging API](https://devdocs.line.me/en/#messaging-api)
 
 ## Documentation
