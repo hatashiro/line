@@ -48,6 +48,7 @@ import Control.Applicative ((<|>))
 import Control.Exception (SomeException)
 import Data.Aeson (FromJSON(..), ToJSON(..), Value(..), object, (.:), (.=))
 import Data.Aeson.Types (Pair)
+import Data.Maybe (maybeToList)
 import Line.Messaging.Common.Types
 import qualified Data.Text as T
 import qualified Data.ByteString.Lazy as BL
@@ -311,9 +312,9 @@ instance Messageable (Template Carousel) where
 -- For more details of each field, please refer to the
 -- <https://devdocs.line.me/en/#buttons Buttons> section in the LINE
 -- documentation.
-data Buttons = Buttons { getButtonsThumbnailURL :: URL
+data Buttons = Buttons { getButtonsThumbnailURL :: Maybe URL
                        -- ^ URL for thumbnail image
-                       , getButtonsTitle :: T.Text
+                       , getButtonsTitle :: Maybe T.Text
                        -- ^ Title text
                        , getButtonsText :: T.Text
                        -- ^ Description text
@@ -324,12 +325,15 @@ data Buttons = Buttons { getButtonsThumbnailURL :: URL
                deriving (Eq, Show)
 
 instance ToJSON Buttons where
-  toJSON (Buttons url title text actions) = object [ "type" .= ("buttons" :: T.Text)
-                                                   , "thumbnailImageUrl" .= url
-                                                   , "title" .= title
-                                                   , "text" .= text
-                                                   , "actions" .= toJSON actions
-                                                   ]
+  toJSON (Buttons maybeURL maybeTitle text actions) =
+    object . concat $
+      [ [ "type" .= ("buttons" :: T.Text)
+        , "text" .= text
+        , "actions" .= toJSON actions
+        ]
+      , maybeToList $ ("thumbnailImageUrl" .=) <$> maybeURL
+      , maybeToList $ ("title" .=) <$> maybeTitle
+      ]
 
 -- | The confirm content type for template message.
 --
@@ -373,9 +377,9 @@ instance ToJSON Carousel where
 --
 -- It has the same fields as 'Buttons', except that the number of actions is
 -- up to 3.
-data Column = Column { getColumnThumbnailURL :: URL
+data Column = Column { getColumnThumbnailURL :: Maybe URL
                      -- ^ URL for thumbnail image
-                     , getColumnTitle :: T.Text
+                     , getColumnTitle :: Maybe T.Text
                      -- ^ Title text
                      , getColumnText :: T.Text
                      -- ^ Description text
@@ -386,11 +390,14 @@ data Column = Column { getColumnThumbnailURL :: URL
               deriving (Eq, Show)
 
 instance ToJSON Column where
-  toJSON (Column url title text actions) = object [ "thumbnailImageUrl" .= url
-                                                  , "title" .= title
-                                                  , "text" .= text
-                                                  , "actions" .= toJSON actions
-                                                  ]
+  toJSON (Column maybeURL maybeTitle text actions) =
+    object . concat $
+      [ [ "text" .= text
+        , "actions" .= toJSON actions
+        ]
+      , maybeToList $ ("thumbnailImageUrl" .=) <$> maybeURL
+      , maybeToList $ ("title" .=) <$> maybeTitle
+      ]
 
 -- | Just a type alias for 'T.Text', used with 'TemplateAction'.
 type Label = T.Text
@@ -403,7 +410,7 @@ data TemplateAction = TplMessageAction Label T.Text
                       -- ^ Message action. When clicked, a specified text will
                       -- be sent into the same room by a user who clicked the
                       -- button.
-                    | TplPostbackAction Label Postback T.Text
+                    | TplPostbackAction Label Postback (Maybe T.Text)
                       -- ^ Postback action. When clicked, a specified text will
                       -- be sent, and postback data will be sent to webhook
                       -- server as a postback event.
@@ -413,11 +420,14 @@ data TemplateAction = TplMessageAction Label T.Text
                     deriving (Eq, Show)
 
 instance ToJSON TemplateAction where
-  toJSON (TplPostbackAction label data' text) = object [ "type" .= ("postback" :: T.Text)
-                                                       , "label" .= label
-                                                       , "data" .= data'
-                                                       , "text" .= text
-                                                       ]
+  toJSON (TplPostbackAction label data' maybeText) =
+    object . concat $
+      [ [ "type" .= ("postback" :: T.Text)
+        , "label" .= label
+        , "data" .= data'
+        ]
+      , maybeToList $ ("text" .=) <$> maybeText
+      ]
   toJSON (TplMessageAction label text) = object [ "type" .= ("message" :: T.Text)
                                                 , "label" .= label
                                                 , "text" .= text
