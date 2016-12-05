@@ -1,3 +1,7 @@
+## 2.1.0.1 (5 Dec 2016)
+
+* Specify lower bounds in cabal file
+
 ## 2.1.0.0 (5 Dec 2016)
 
 * Use `http-conduit` instead of `wreq` as HTTP client
