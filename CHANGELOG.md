@@ -1,4 +1,8 @@
-## 2.0.0.0 (4 Dev 2016)
+## 2.1.0.0 (5 Dec 2016)
+
+* Use `http-conduit` instead of `wreq` as HTTP client
+
+## 2.0.0.0 (4 Dec 2016)
 
 * Make `Line.Messaging.Webhook.Validation` independent from WAI. As it does not
   use `Request` of WAI, its argument type is changed.
