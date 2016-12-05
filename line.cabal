@@ -48,8 +48,7 @@ library
                      , cryptohash-sha256
                      , base64-bytestring
                      , time
-                     , wreq
-                     , lens
+                     , http-conduit
                      , scotty
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings

@@ -25,8 +25,6 @@ module Line.Messaging.API (
   ) where
 
 import Control.Exception (SomeException(..))
-import Control.Lens ((&), (.~), (^.))
-import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Reader (runReaderT, ReaderT, ask)
 import Control.Monad.Trans.Except (runExceptT, ExceptT, throwE, catchE)
@@ -34,10 +32,11 @@ import Data.Aeson (ToJSON(..), (.=), object, decode', eitherDecode')
 import Data.Text.Encoding (encodeUtf8)
 import Line.Messaging.API.Types
 import Line.Messaging.Types (ReplyToken)
+import Network.HTTP.Simple
+import Network.HTTP.Types.Status (Status(..))
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text as T
-import qualified Network.Wreq as Wr
 
 -- | A monad transformer for API calls. If translated into a human-readable
 -- form, it means:
@@ -71,38 +70,36 @@ type APIIO a = ReaderT ChannelAccessToken (ExceptT APIError IO) a
 runAPI :: IO ChannelAccessToken -> APIIO a -> IO (Either APIError a)
 runAPI getToken api = getToken >>= runExceptT . runReaderT api
 
-getOpts :: APIIO Wr.Options
-getOpts = do
+createReq :: B.ByteString -> String -> APIIO Request
+createReq method url = do
   token <- encodeUtf8 <$> ask
-  return $ Wr.defaults & Wr.header "Authorization" .~ [ "Bearer " `B.append` token ]
-                       & Wr.checkStatus .~ Just (\ _ _ _ -> Nothing) -- do not throw StatusCodeException
+  setRequestIgnoreStatus .
+    setRequestMethod method .
+    addRequestHeader "Authorization" ("Bearer " `B.append` token)
+    <$> parseRequest url
 
 handleError :: SomeException -> (ExceptT APIError IO) a
 handleError = throwE . UndefinedError
 
-runReqIO :: IO (Wr.Response BL.ByteString) -> APIIO BL.ByteString
-runReqIO reqIO = lift $ do
-  res <- liftIO reqIO `catchE` handleError
-  let statusCode = res ^. Wr.responseStatus . Wr.statusCode
-  let body = res ^. Wr.responseBody
-  case statusCode of
+runReq :: Request -> APIIO BL.ByteString
+runReq req = lift $ do
+  res <- httpLBS req `catchE` handleError
+  let status = statusCode $ getResponseStatus res
+  let body = getResponseBody res
+  case status of
     200 -> return $ body
     400 -> throwE $ BadRequest (decode' body)
     401 -> throwE $ Unauthorized (decode' body)
     403 -> throwE $ Forbidden (decode' body)
     429 -> throwE $ TooManyRequests (decode' body)
     500 -> throwE $ InternalServerError (decode' body)
-    _ -> throwE $ UndefinedStatusCode statusCode body
+    _ -> throwE $ UndefinedStatusCode status body
 
 get :: String -> APIIO BL.ByteString
-get url = do
-  opts <- getOpts
-  runReqIO $ Wr.getWith opts url
+get url = createReq "GET" url >>= runReq
 
 post :: ToJSON a => String -> a -> APIIO BL.ByteString
-post url body = do
-  opts <- getOpts
-  runReqIO $ Wr.postWith opts url (toJSON body)
+post url body = setRequestBodyJSON body <$> createReq "POST" url >>= runReq
 
 -- | Push messages into a receiver. The receiver can be a user, a room or
 -- a group, specified by 'ID'.
