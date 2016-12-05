@@ -25,7 +25,7 @@ getChannelSecret = return "some channel secret"
 -- handler.
 app :: ScottyM ()
 app =
-  get "/webhook" $ do
+  post "/webhook" $ do
     channelSecret <- liftIO getChannelSecret
     webhookAction channelSecret handler defaultOnFailure'
 
