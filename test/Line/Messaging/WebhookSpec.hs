@@ -44,7 +44,7 @@ spec = do
 
   describe "WAI webhook" $
     let waiApp = return $ webhookApp "some-secret" (const $ return ()) defaultOnFailure
-        webhookReq sec body hasCorrectSig = request "GET" "/" headers body
+        webhookReq sec body hasCorrectSig = request "POST" "/" headers body
           where
             sig = if hasCorrectSig then createSig sec body else "wrong sig"
             headers = [ ("X-Line-Signature", sig) ]
@@ -62,8 +62,8 @@ spec = do
 
   describe "Scotty webhook" $
     let waiApp = Scotty.scottyApp $
-          Scotty.get "/" $ webhookAction "some-secret" (const $ return ()) defaultOnFailure'
-        webhookReq sec body hasCorrectSig = request "GET" "/" headers body
+          Scotty.post "/" $ webhookAction "some-secret" (const $ return ()) defaultOnFailure'
+        webhookReq sec body hasCorrectSig = request "POST" "/" headers body
           where
             sig = if hasCorrectSig then createSig sec body else "wrong sig"
             headers = [ ("X-Line-Signature", sig) ]

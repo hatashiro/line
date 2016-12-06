@@ -99,7 +99,7 @@ defaultOnFailure failure _ f = f .
 -- @
 -- main :: IO ()
 -- main = scotty 3000 $ do
---   get "/webhook" $ webhookAction handler defaultOnFailure'
+--   post "/webhook" $ webhookAction handler defaultOnFailure'
 --
 -- handler :: [Event] -> IO ()
 -- handler events = forM_ events handleEvent
