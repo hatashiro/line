@@ -1,3 +1,7 @@
+## 2.1.0.2 (6 Dec 2016)
+
+* Doc and test fixes to use POST for webhooks
+
 ## 2.1.0.1 (5 Dec 2016)
 
 * Specify lower bounds in cabal file
