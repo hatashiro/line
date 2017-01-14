@@ -17,6 +17,7 @@ module Line.Messaging.API (
   -- | Every API call returns its result with @'APIIO'@. About the usage of
   -- @'APIIO'@, please refer to the previous section.
   push,
+  multicast,
   reply,
   getContent,
   getProfile,
@@ -128,6 +129,20 @@ push :: ID -> [Message] -> APIIO ()
 push id' ms = do
   let url = "https://api.line.me/v2/bot/message/push"
   _ <- post url $ object [ "to" .= id'
+                         , "messages" .= map toJSON ms
+                         ]
+  return ()
+
+-- | Send messages to multiple users at any time.
+--
+-- Messages cannot be sent to groups or rooms.
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#multicast its API reference>.
+multicast :: [ID] -> [Message] -> APIIO ()
+multicast ids ms = do
+  let url = "https://api.line.me/v2/bot/message/multicast"
+  _ <- post url $ object [ "to" .= map toJSON ids
                          , "messages" .= map toJSON ms
                          ]
   return ()
