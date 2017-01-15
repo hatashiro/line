@@ -1,3 +1,7 @@
+## 2.2.0 (15 Jan 2017)
+
+* Add multicast API support
+
 ## 2.1.0.2 (6 Dec 2016)
 
 * Doc and test fixes to use POST for webhooks
