@@ -449,6 +449,64 @@ goodBeacon = [r|
 ] }
 |]
 
+goodBeaconLeave :: BL.ByteString
+goodBeaconLeave = [r|
+{ "events": [
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "beacon",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+  },
+  "beacon": {
+    "hwid": "d41d8cd98f",
+    "type": "leave"
+  }
+}
+] }
+|]
+
+goodBeaconBanner :: BL.ByteString
+goodBeaconBanner = [r|
+{ "events": [
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "beacon",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+  },
+  "beacon": {
+    "hwid": "d41d8cd98f",
+    "type": "banner"
+  }
+}
+] }
+|]
+
+goodBeaconWithDm :: BL.ByteString
+goodBeaconWithDm = [r|
+{ "events": [
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "beacon",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+  },
+  "beacon": {
+    "hwid": "d41d8cd98f",
+    "type": "enter",
+    "dm": "i am a direct message."
+  }
+}
+] }
+|]
+
 badBeacon :: BL.ByteString
 badBeacon = [r|
 { "events": [

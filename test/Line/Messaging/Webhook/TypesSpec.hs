@@ -129,6 +129,9 @@ spec = do
     ]
 
   describe "beacon event" $ fromJSONSpec
-    [ ( goodBeacon, replyE BeaconEvent (BeaconEnter "d41d8cd98f") )
+    [ ( goodBeacon, replyE BeaconEvent (BeaconEnter "d41d8cd98f" Nothing) )
+    , ( goodBeaconLeave, replyE BeaconEvent (BeaconLeave "d41d8cd98f" Nothing) )
+    , ( goodBeaconBanner, replyE BeaconEvent (BeaconBanner "d41d8cd98f" Nothing) )
+    , ( goodBeaconWithDm, replyE BeaconEvent (BeaconEnter "d41d8cd98f" (Just "i am a direct message.")) )
     , ( badBeacon, Nothing )
     ]

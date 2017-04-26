@@ -40,6 +40,8 @@ module Line.Messaging.Webhook.Types (
   EventMessage (..),
   -- *** Beacon event
   BeaconData (..),
+  getHWID,
+  getDeviceMessage,
   ) where
 
 import Data.Aeson
@@ -239,14 +241,31 @@ instance FromJSON EventMessage where
   parseJSON _ = fail "IncommingMessage"
 
 -- | Represent beacon data.
-data BeaconData = BeaconEnter { getHWID :: ID
-                                -- ^ Get hardware ID of the beacon.
-                              }
+data BeaconData = BeaconEnter ID (Maybe String)
+                | BeaconLeave ID (Maybe String)
+                | BeaconBanner ID (Maybe String)
                 deriving (Eq, Show)
+
+
+-- |  Get hardware ID of the beacon.
+getHWID :: BeaconData -> ID
+getHWID (BeaconEnter hwid _) = hwid
+getHWID (BeaconLeave hwid _) = hwid
+getHWID (BeaconBanner hwid _) = hwid
+
+-- |  Get device message from the beacon, if exists.
+getDeviceMessage :: BeaconData -> Maybe String
+getDeviceMessage (BeaconEnter _ dm) = dm
+getDeviceMessage (BeaconLeave _ dm) = dm
+getDeviceMessage (BeaconBanner _ dm) = dm
 
 instance FromJSON BeaconData where
   parseJSON (Object v) = v .: "type" >>= \ t ->
     case t :: T.Text of
-      "enter" -> BeaconEnter <$> v .: "hwid"
+      "enter" -> parseBeacon BeaconEnter
+      "leave" -> parseBeacon BeaconLeave
+      "banner" -> parseBeacon BeaconBanner
       _ -> fail "BeaconData"
+    where
+      parseBeacon f = f <$> v .: "hwid" <*> v .:? "dm"
   parseJSON _ = fail "BeaconData"
