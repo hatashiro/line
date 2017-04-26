@@ -1,3 +1,7 @@
+## 3.0.0 (26 Apr 2017)
+
+* Add type and dm support for Beacon event
+
 ## 2.2.0 (15 Jan 2017)
 
 * Add multicast API support
