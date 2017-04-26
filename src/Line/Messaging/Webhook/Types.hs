@@ -241,9 +241,9 @@ instance FromJSON EventMessage where
   parseJSON _ = fail "IncommingMessage"
 
 -- | Represent beacon data.
-data BeaconData = BeaconEnter ID (Maybe String)
-                | BeaconLeave ID (Maybe String)
-                | BeaconBanner ID (Maybe String)
+data BeaconData = BeaconEnter ID (Maybe T.Text)
+                | BeaconLeave ID (Maybe T.Text)
+                | BeaconBanner ID (Maybe T.Text)
                 deriving (Eq, Show)
 
 
@@ -254,7 +254,7 @@ getHWID (BeaconLeave hwid _) = hwid
 getHWID (BeaconBanner hwid _) = hwid
 
 -- |  Get device message from the beacon, if exists.
-getDeviceMessage :: BeaconData -> Maybe String
+getDeviceMessage :: BeaconData -> Maybe T.Text
 getDeviceMessage (BeaconEnter _ dm) = dm
 getDeviceMessage (BeaconLeave _ dm) = dm
 getDeviceMessage (BeaconBanner _ dm) = dm
