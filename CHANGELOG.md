@@ -1,3 +1,7 @@
+## 3.0.1 (26 Apr 2017)
+
+* Use Text instead of String for Beacon dm
+
 ## 3.0.0 (26 Apr 2017)
 
 * Add type and dm support for Beacon event
