@@ -73,6 +73,11 @@ spec = do
     , ( badAudioMessage, Nothing )
     ]
 
+  describe "file message event" $ fromJSONSpec
+    [ ( goodFileMessage, replyE MessageEvent (FileEM "325708" "hello.txt" 1234) )
+    , ( badFileMessage, Nothing )
+    ]
+
   describe "location message event" $ fromJSONSpec
     [ ( goodLocationMessage, replyE MessageEvent (LocationEM "325708" $
                                                Location

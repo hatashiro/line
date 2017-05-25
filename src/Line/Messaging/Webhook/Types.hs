@@ -224,6 +224,7 @@ data EventMessage = TextEM ID Text -- ^ Text event message.
                   | ImageEM ID -- ^ Image event message.
                   | VideoEM ID -- ^ Video event message.
                   | AudioEM ID -- ^ Audio event message.
+                  | FileEM ID T.Text Integer -- ^ File event message.
                   | LocationEM ID Location -- ^ Location event message.
                   | StickerEM ID Sticker -- ^ Sticker event message.
                   deriving (Eq, Show)
@@ -235,6 +236,7 @@ instance FromJSON EventMessage where
       "image" -> ImageEM <$> v .: "id"
       "video" -> VideoEM <$> v .: "id"
       "audio" -> AudioEM <$> v .: "id"
+      "file" -> FileEM <$> v .: "id" <*> v .: "fileName" <*> (read <$> v .: "fileSize")
       "location" -> LocationEM <$> v .: "id" <*> parseJSON (Object v)
       "sticker" -> StickerEM <$> v .: "id" <*> parseJSON (Object v)
       _ -> fail "EventMessage"
