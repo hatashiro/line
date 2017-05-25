@@ -1,3 +1,7 @@
+## 3.1.0 (26 May 2017)
+
+* Add support for file message
+
 ## 3.0.1 (26 Apr 2017)
 
 * Use Text instead of String for Beacon dm
