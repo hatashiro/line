@@ -207,6 +207,35 @@ carouselTemplateMessageableResult = [r|
 }
 |]
 
+imageCarouselTemplateMessageableResult :: BL.ByteString
+imageCarouselTemplateMessageableResult = [r|
+{
+  "type": "template",
+  "altText": "this is an image carousel template",
+  "template": {
+      "type": "image_carousel",
+      "columns": [
+          {
+              "imageUrl": "https://example.com/bot/images/item1.jpg",
+              "action": {
+                  "type": "postback",
+                  "label": "Buy",
+                  "data": "action=buy&itemid=111"
+              }
+          },
+          {
+              "imageUrl": "https://example.com/bot/images/item2.jpg",
+              "action": {
+                  "type": "postback",
+                  "label": "Buy",
+                  "data": "action=buy&itemid=222"
+              }
+          }
+      ]
+  }
+}
+|]
+
 fullProfile :: BL.ByteString
 fullProfile = [r|
 {

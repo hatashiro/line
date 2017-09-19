@@ -34,7 +34,9 @@ module Line.Messaging.API.Types (
   Buttons (..),
   Confirm (..),
   Carousel (..),
+  ImageCarousel (..),
   Column (..),
+  ImageColumn (..),
   Label,
   TemplateAction (..),
   -- * Profile
@@ -273,7 +275,7 @@ toAreaJSON (x, y, w, h) = object [ "x" .= x, "y" .= y, "width" .= w, "height" .=
 --
 -- It has a type parameter @t@ which means a template content type. The type is
 -- polymolphic, but 'Messageable' instances are defined only for 'Buttons',
--- 'Confirm', and 'Carousel'.
+-- 'Confirm', 'Carousel', and 'ImageCarousel'.
 --
 -- About how to send template message and what each field means, please
 -- refer to
@@ -302,6 +304,10 @@ instance Messageable (Template Confirm) where
   toObject = templateToObject
 
 instance Messageable (Template Carousel) where
+  toType = templateType
+  toObject = templateToObject
+
+instance Messageable (Template ImageCarousel) where
   toType = templateType
   toObject = templateToObject
 
@@ -398,6 +404,40 @@ instance ToJSON Column where
       , maybeToList $ ("thumbnailImageUrl" .=) <$> maybeURL
       , maybeToList $ ("title" .=) <$> maybeTitle
       ]
+
+-- | The image carousel content type for template message.
+--
+-- <<https://devdocs.line.me/images/image_carousel.png Image carousel template>>
+--
+-- For more details of each field, please refer to the
+-- <https://devdocs.line.me/en/#image-carousel Image carousel> section in the LINE
+-- documentation.
+data ImageCarousel = ImageCarousel { getImageColumns :: [ImageColumn]
+                                   -- ^ A list of columns for an image carousel template
+                                   }
+                   deriving (Eq, Show)
+
+instance ToJSON ImageCarousel where
+  toJSON (ImageCarousel columns) = object [ "type" .= ("image_carousel" :: T.Text)
+                                          , "columns" .= toJSON columns
+                                          ]
+
+-- | Actual contents of carousel template.
+--
+-- It has the same fields as 'Buttons', except that the number of actions is
+-- up to 3.
+data ImageColumn = ImageColumn { getCarouselImageURL :: URL
+                               -- ^ URL for thumbnail image
+                               , getColumnAction :: TemplateAction
+                               -- ^ A template action
+                               }
+                 deriving (Eq, Show)
+
+instance ToJSON ImageColumn where
+  toJSON (ImageColumn url action) =
+    object [ "imageUrl" .= url
+           , "action" .= toJSON action
+           ]
 
 -- | Just a type alias for 'T.Text', used with 'TemplateAction'.
 type Label = T.Text

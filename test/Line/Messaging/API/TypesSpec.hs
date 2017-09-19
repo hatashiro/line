@@ -98,6 +98,16 @@ spec = do
                 ])
       carouselTemplateMessageableResult
 
+    messageableSpec "template image carousel"
+      (Template "this is an image carousel template" $
+       ImageCarousel [ ImageColumn "https://example.com/bot/images/item1.jpg"
+                         (TplPostbackAction "Buy" "action=buy&itemid=111" Nothing)
+                     , ImageColumn "https://example.com/bot/images/item2.jpg"
+                         (TplPostbackAction "Buy" "action=buy&itemid=222" Nothing)
+                     ]
+      )
+      imageCarouselTemplateMessageableResult
+
   describe "JSON decode" $ do
     describe "profile" $ fromJSONSpec
       [ ( fullProfile, Just $ Profile
