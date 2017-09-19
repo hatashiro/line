@@ -21,6 +21,8 @@ module Line.Messaging.API (
   reply,
   getContent,
   getProfile,
+  getGroupMemberProfile,
+  getRoomMemberProfile,
   leaveRoom,
   leaveGroup,
   ) where
@@ -189,6 +191,34 @@ getContent id' = do
 getProfile :: ID -> APIIO Profile
 getProfile id' = do
   let url = "https://api.line.me/v2/bot/profile/" ++ T.unpack id'
+  bs <- get url
+  case eitherDecode' bs of
+    Right profile -> return profile
+    Left errStr -> lift . throwE . JSONDecodeError $ errStr
+
+-- | Get a profile of a user in a group, specified by the group ID and the user ID.
+--
+-- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
+--
+-- Please refer to <https://devdocs.line.me/en/#get-group-room-member-profile its API reference>
+-- for the difference between this API and 'getProfile'.
+getGroupMemberProfile :: ID -> ID -> APIIO Profile
+getGroupMemberProfile groupId userId = do
+  let url = "https://api.line.me/v2/bot/group/" ++ T.unpack groupId ++ "/member/" ++ T.unpack userId
+  bs <- get url
+  case eitherDecode' bs of
+    Right profile -> return profile
+    Left errStr -> lift . throwE . JSONDecodeError $ errStr
+
+-- | Get a profile of a user in a room, specified by the room ID and the user ID.
+--
+-- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
+--
+-- Please refer to <https://devdocs.line.me/en/#get-group-room-member-profile its API reference>
+-- for the difference between this API and 'getProfile'.
+getRoomMemberProfile :: ID -> ID -> APIIO Profile
+getRoomMemberProfile roomId userId = do
+  let url = "https://api.line.me/v2/bot/room/" ++ T.unpack roomId ++ "/member/" ++ T.unpack userId
   bs <- get url
   case eitherDecode' bs of
     Right profile -> return profile
