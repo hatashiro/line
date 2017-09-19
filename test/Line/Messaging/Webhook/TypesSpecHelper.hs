@@ -464,6 +464,69 @@ goodPostback = [r|
 ] }
 |]
 
+goodPostbackWithDate :: BL.ByteString
+goodPostbackWithDate = [r|
+{ "events": [
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "postback",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+  },
+  "postback": {
+    "data": "action=buyItem&itemId=123123&color=red",
+    "params": {
+      "date": "1990-01-01"
+    }
+  }
+}
+] }
+|]
+
+goodPostbackWithTime :: BL.ByteString
+goodPostbackWithTime = [r|
+{ "events": [
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "postback",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+  },
+  "postback": {
+    "data": "action=buyItem&itemId=123123&color=red",
+    "params": {
+      "time": "12:34"
+    }
+  }
+}
+] }
+|]
+
+goodPostbackWithDatetime :: BL.ByteString
+goodPostbackWithDatetime = [r|
+{ "events": [
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "postback",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+  },
+  "postback": {
+    "data": "action=buyItem&itemId=123123&color=red",
+    "params": {
+      "datetime": "1990-01-01 12:34"
+    }
+  }
+}
+] }
+|]
+
 badPostback :: BL.ByteString
 badPostback = [r|
 { "events": [

@@ -40,6 +40,7 @@ module Line.Messaging.API.Types (
   ImageColumn (..),
   Label,
   TemplateAction (..),
+  DatetimeMode (..),
   -- * Profile
   Profile (..),
   -- * Error types
@@ -451,21 +452,33 @@ data TemplateAction = TplMessageAction Label T.Text
                       -- ^ Message action. When clicked, a specified text will
                       -- be sent into the same room by a user who clicked the
                       -- button.
-                    | TplPostbackAction Label Postback (Maybe T.Text)
+                    | TplPostbackAction Label T.Text (Maybe T.Text)
                       -- ^ Postback action. When clicked, a specified text will
                       -- be sent, and postback data will be sent to webhook
                       -- server as a postback event.
                     | TplURIAction Label URL
                       -- ^ URI action. When clicked, a web page with a specified
                       -- URI will open in the in-app browser.
+                    | TplDatetimePickerAction { label' :: (Maybe Label)
+                                              , data' :: T.Text
+                                              , mode' :: DatetimeMode
+                                              , initial' :: (Maybe T.Text)
+                                              , max' :: (Maybe T.Text)
+                                              , min' :: (Maybe T.Text)
+                                              }
+                      -- ^ Datetime picker action. When clicked, a postback action
+                      -- will be sent with the date and time selected by the
+                      -- user from the date and time selection dialog. For the
+                      -- detailed information of datetime picker, please refer
+                      -- to the <https://devdocs.line.me/en/#datetime-picker-action official documentation>.
                     deriving (Eq, Show)
 
 instance ToJSON TemplateAction where
-  toJSON (TplPostbackAction label data' maybeText) =
+  toJSON (TplPostbackAction label data'' maybeText) =
     object . concat $
       [ [ "type" .= ("postback" :: T.Text)
         , "label" .= label
-        , "data" .= data'
+        , "data" .= data''
         ]
       , maybeToList $ ("text" .=) <$> maybeText
       ]
@@ -474,9 +487,26 @@ instance ToJSON TemplateAction where
                                                 , "text" .= text
                                                 ]
   toJSON (TplURIAction label uri) = object [ "type" .= ("uri" :: T.Text)
-                                           , "label" .= label
-                                           , "uri" .= uri
-                                           ]
+                                            , "label" .= label
+                                            , "uri" .= uri
+                                            ]
+  toJSON (TplDatetimePickerAction label data'' mode initial max'' min'') =
+    object . concat $ [ [ "type" .= ("datetimepicker" :: T.Text)
+                        , "data" .= data''
+                        , "mode" .= mode
+                        ]
+                      , maybeToList $ ("label" .=) <$> label
+                      , maybeToList $ ("initial" .=) <$> initial
+                      , maybeToList $ ("max" .=) <$> max''
+                      , maybeToList $ ("min" .=) <$> min''
+                      ]
+
+data DatetimeMode = Date | Time | Datetime deriving (Eq, Show)
+
+instance ToJSON DatetimeMode where
+  toJSON Date = "date"
+  toJSON Time = "time"
+  toJSON Datetime = "datetime"
 
 -- | A type to represent a user's profile.
 --

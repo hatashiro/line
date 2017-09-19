@@ -9,7 +9,6 @@ module Line.Messaging.Common.Types (
   -- * LINE API types
   ChannelSecret,
   ChannelAccessToken,
-  Postback,
   ) where
 
 import qualified Data.Text as T
@@ -27,6 +26,3 @@ type ChannelSecret = T.Text
 -- | A type alias to specify a channel access token. About issueing and using
 -- the channel access token, please refer to corresponding LINE documentations.
 type ChannelAccessToken = T.Text
-
--- | A type alias for postback data.
-type Postback = T.Text

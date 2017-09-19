@@ -120,6 +120,12 @@ buttonsTemplateMessageableResult = [r|
             "type": "uri",
             "label": "View detail",
             "uri": "http://example.com/page/123"
+          },
+          {
+            "type": "datetimepicker",
+            "label": "yes label",
+            "data": "pickpick",
+            "mode": "datetime"
           }
       ]
   }
@@ -144,6 +150,14 @@ confirmTemplateMessageableResult = [r|
             "type": "message",
             "label": "No",
             "text": "no"
+          },
+          {
+            "type": "datetimepicker",
+            "data": "pickpick2",
+            "mode": "date",
+            "initial": "1990-01-01",
+            "max": "2100-12-31",
+            "min": "1900-01-01"
           }
       ]
   }
@@ -177,6 +191,13 @@ carouselTemplateMessageableResult = [r|
                     "type": "uri",
                     "label": "View detail",
                     "uri": "http://example.com/page/111"
+                },
+                {
+                  "type": "datetimepicker",
+                  "data": "pickpick3",
+                  "mode": "time",
+                  "max": "23:23",
+                  "min": "11:11"
                 }
             ]
           },

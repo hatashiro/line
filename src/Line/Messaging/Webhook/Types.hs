@@ -37,6 +37,9 @@ module Line.Messaging.Webhook.Types (
   EventSource (..),
   -- *** Message event
   EventMessage (..),
+  -- *** Postback event
+  Postback (..),
+  PostbackParams (..),
   -- *** Beacon event
   BeaconData (..),
   getHWID,
@@ -174,7 +177,7 @@ instance FromJSON Event where
       "unfollow" -> UnfollowEvent <$> (nonReplyable v <*> none)
       "join" -> JoinEvent <$> (replyable v <*> none)
       "leave" -> LeaveEvent <$> (nonReplyable v <*> none)
-      "postback" -> PostbackEvent <$> (replyable v <*> ((v .: "postback") >>= (.: "data")))
+      "postback" -> PostbackEvent <$> (replyable v <*> v .: "postback")
       "beacon" -> BeaconEvent <$> (replyable v <*> v .: "beacon")
       _ -> fail "Event"
     where
@@ -235,6 +238,39 @@ instance FromJSON EventMessage where
       _ -> fail "EventMessage"
   parseJSON _ = fail "IncommingMessage"
 
+-- | Represent Postback data.
+data Postback = Postback { data' :: T.Text
+                         , params :: Maybe PostbackParams
+                         }
+              deriving (Eq, Show)
+
+
+instance FromJSON Postback where
+  parseJSON (Object v) = Postback <$> v .: "data" <*> v .:? "params"
+  parseJSON _ = fail "Postback"
+
+-- | Represent params of Postback data.
+--
+-- It's currently used only for the datetime picker action. For the detail,
+-- please refer to the <https://devdocs.line.me/en/#postback-params-object official documentation>.
+data PostbackParams = PostbackParamsDate T.Text
+                    | PostbackParamsTime T.Text
+                    | PostbackParamsDatetime T.Text
+                    | PostbackParamsUnknown
+                    deriving (Eq, Show)
+
+instance FromJSON PostbackParams where
+  parseJSON (Object v) = go [ ("date", PostbackParamsDate)
+                            , ("time", PostbackParamsTime)
+                            , ("datetime", PostbackParamsDatetime)
+                            ]
+    where
+    go ((field, constructor):xs) = v .:? field >>= \m -> case m of
+      Just str -> return $ constructor str
+      Nothing -> go xs
+    go [] = return PostbackParamsUnknown
+  parseJSON _ = fail "PostbackParams"
+
 -- | Represent beacon data.
 data BeaconData = BeaconEnter ID (Maybe T.Text)
                 | BeaconLeave ID (Maybe T.Text)
@@ -242,13 +278,13 @@ data BeaconData = BeaconEnter ID (Maybe T.Text)
                 deriving (Eq, Show)
 
 
--- |  Get hardware ID of the beacon.
+-- | Get hardware ID of the beacon.
 getHWID :: BeaconData -> ID
 getHWID (BeaconEnter hwid _) = hwid
 getHWID (BeaconLeave hwid _) = hwid
 getHWID (BeaconBanner hwid _) = hwid
 
--- |  Get device message from the beacon, if exists.
+-- | Get device message from the beacon, if exists.
 getDeviceMessage :: BeaconData -> Maybe T.Text
 getDeviceMessage (BeaconEnter _ dm) = dm
 getDeviceMessage (BeaconLeave _ dm) = dm

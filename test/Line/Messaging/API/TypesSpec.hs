@@ -68,6 +68,7 @@ spec = do
        [ TplPostbackAction "Buy" "action=buy&itemid=123" Nothing
        , TplPostbackAction "Add to cart" "action=add&itemid=123" Nothing
        , TplURIAction "View detail" "http://example.com/page/123"
+       , TplDatetimePickerAction (Just "yes label") "pickpick" Datetime Nothing Nothing Nothing
        ])
       buttonsTemplateMessageableResult
 
@@ -76,6 +77,7 @@ spec = do
        Confirm "Are you sure?"
        [ TplMessageAction "Yes" "yes"
        , TplMessageAction "No" "no"
+       , TplDatetimePickerAction Nothing "pickpick2" Date (Just "1990-01-01") (Just "2100-12-31") (Just "1900-01-01")
        ])
       confirmTemplateMessageableResult
 
@@ -87,6 +89,7 @@ spec = do
                          [ TplPostbackAction "Buy" "action=buy&itemid=111" Nothing
                          , TplPostbackAction "Add to cart" "action=add&itemid=111" Nothing
                          , TplURIAction "View detail" "http://example.com/page/111"
+                         , TplDatetimePickerAction Nothing "pickpick3" Time Nothing (Just "23:23") (Just "11:11")
                          ]
                 , Column (Just "https://example.com/bot/images/item2.jpg")
                          (Just "this is menu")

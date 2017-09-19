@@ -131,7 +131,10 @@ spec = do
     ]
 
   describe "postback event" $ fromJSONSpec
-    [ ( goodPostback, replyE PostbackEvent "action=buyItem&itemId=123123&color=red" )
+    [ ( goodPostback, replyE PostbackEvent (Postback "action=buyItem&itemId=123123&color=red" Nothing) )
+    , ( goodPostbackWithDate, replyE PostbackEvent (Postback "action=buyItem&itemId=123123&color=red" (Just $ PostbackParamsDate "1990-01-01")) )
+    , ( goodPostbackWithTime, replyE PostbackEvent (Postback "action=buyItem&itemId=123123&color=red" (Just $ PostbackParamsTime "12:34")) )
+    , ( goodPostbackWithDatetime, replyE PostbackEvent (Postback "action=buyItem&itemId=123123&color=red" (Just $ PostbackParamsDatetime "1990-01-01 12:34")) )
     , ( badPostback, Nothing )
     ]
 
