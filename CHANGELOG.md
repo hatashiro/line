@@ -1,3 +1,13 @@
+## 4.0.0 (19 Sep 2017)
+
+* Use the latest Stack resolver 9.5
+* Add userID fields to event sources
+* Add 'Get group/room member profile' APIs
+* Add 'image carousel' template message
+* Add 'datetimepicker' template action type
+* Implement 'Get group/room member IDs' APIs
+* Use DuplicateRecordFields to simplify field names
+
 ## 3.1.0 (26 May 2017)
 
 * Add support for file message
