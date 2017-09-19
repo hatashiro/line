@@ -2,6 +2,7 @@
 This module provides types to be used with "Line.Messaging.API".
 -}
 
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE StandaloneDeriving #-}
@@ -117,8 +118,8 @@ instance Messageable Text where
 --
 -- It contains URLs of an original image and its preview. Its corresponding JSON
 -- spec is described <https://devdocs.line.me/en/#image here>.
-data Image = Image { getImageURL :: URL
-                   , getImagePreviewURL :: URL
+data Image = Image { getURL :: URL
+                   , getPreviewURL :: URL
                    }
              deriving (Eq, Show)
 
@@ -132,8 +133,8 @@ instance Messageable Image where
 --
 -- It contains URLs of an original video and its preview. Its corresponding JSON
 -- spec is described <https://devdocs.line.me/en/#video here>.
-data Video = Video { getVideoURL :: URL
-                   , getVideoPreviewURL :: URL
+data Video = Video { getURL :: URL
+                   , getPreviewURL :: URL
                    }
              deriving (Eq, Show)
 
@@ -148,8 +149,8 @@ instance Messageable Video where
 -- It contains a URL of an audio, and its duration in milliseconds. Its
 -- corresponding JSON spec is described
 -- <https://devdocs.line.me/en/#audio here>.
-data Audio = Audio { getAudioURL :: URL
-                   , getAudioDuration :: Integer
+data Audio = Audio { getURL :: URL
+                   , getDuration :: Integer
                    }
              deriving (Eq, Show)
 
@@ -169,7 +170,7 @@ instance Messageable Audio where
 -- About the webhook usage, please refer to
 -- <./Line-Messaging-Webhook-Types.html#t:EventMessage EventMessage> in
 -- "Line.Messaging.Webhook.Types".
-data Location = Location { getLocationTitle :: T.Text
+data Location = Location { getTitle :: T.Text
                          , getAddress :: T.Text
                          , getLatitude :: Double
                          , getLongitude :: Double
@@ -223,13 +224,13 @@ instance Messageable Sticker where
 -- <https://devdocs.line.me/en/#imagemap-message image map message spec>.
 data ImageMap = ImageMap { getBaseImageURL :: URL
                            -- ^ <https://devdocs.line.me/en/#base-url Base URL> of images
-                         , getIMAltText :: T.Text
+                         , getAltText :: T.Text
                            -- ^ Alt text for devices not supporting image map
                          , getBaseImageSize :: (Integer, Integer)
                            -- ^ Image size tuple, (width, height) specifically.
                            -- The width to be set to 1040, the height to be set to
                            -- the value corresponding to a width of 1040.
-                         , getIMActions :: [ImageMapAction]
+                         , getActions :: [ImageMapAction]
                            -- ^ Actions to be executed when each area is tapped
                          }
                 deriving (Eq, Show)
@@ -280,9 +281,9 @@ toAreaJSON (x, y, w, h) = object [ "x" .= x, "y" .= y, "width" .= w, "height" .=
 -- About how to send template message and what each field means, please
 -- refer to
 -- <https://devdocs.line.me/en/#template-messages template message spec>.
-data Template t = Template { getTemplateAltText :: T.Text
+data Template t = Template { getAltText :: T.Text
                              -- ^ Alt text for devices not supporting template message
-                           , getTemplate :: t
+                           , getTemplateContent :: t
                              -- ^ Template content type
                            }
                   deriving (Eq, Show)
@@ -318,13 +319,13 @@ instance Messageable (Template ImageCarousel) where
 -- For more details of each field, please refer to the
 -- <https://devdocs.line.me/en/#buttons Buttons> section in the LINE
 -- documentation.
-data Buttons = Buttons { getButtonsThumbnailURL :: Maybe URL
+data Buttons = Buttons { getThumbnailURL :: Maybe URL
                        -- ^ URL for thumbnail image
-                       , getButtonsTitle :: Maybe T.Text
+                       , getTitle :: Maybe T.Text
                        -- ^ Title text
-                       , getButtonsText :: T.Text
+                       , getText :: T.Text
                        -- ^ Description text
-                       , getButtonsActions :: [TemplateAction]
+                       , getActions :: [TemplateAction]
                        -- ^ A list of template actions, each of which represents
                        -- a button (max: 4)
                        }
@@ -348,9 +349,9 @@ instance ToJSON Buttons where
 -- For more details of each field, please refer to the
 -- <https://devdocs.line.me/en/#confirm Confirm> section in the LINE
 -- documentation.
-data Confirm = Confirm { getConfirmText :: T.Text
+data Confirm = Confirm { getText :: T.Text
                        -- ^ Confirm text
-                       , getConfirmActions :: [TemplateAction]
+                       , getActions :: [TemplateAction]
                        -- ^ A list of template actions, each of which represents
                        -- a button (max: 2)
                        }
@@ -383,13 +384,13 @@ instance ToJSON Carousel where
 --
 -- It has the same fields as 'Buttons', except that the number of actions is
 -- up to 3.
-data Column = Column { getColumnThumbnailURL :: Maybe URL
+data Column = Column { getThumbnailURL :: Maybe URL
                      -- ^ URL for thumbnail image
-                     , getColumnTitle :: Maybe T.Text
+                     , getTitle :: Maybe T.Text
                      -- ^ Title text
-                     , getColumnText :: T.Text
+                     , getText :: T.Text
                      -- ^ Description text
-                     , getColumnActions :: [TemplateAction]
+                     , getActions :: [TemplateAction]
                      -- ^ A list of template actions, each of which represents
                      -- a button (max: 3)
                      }
@@ -412,7 +413,7 @@ instance ToJSON Column where
 -- For more details of each field, please refer to the
 -- <https://devdocs.line.me/en/#image-carousel Image carousel> section in the LINE
 -- documentation.
-data ImageCarousel = ImageCarousel { getImageColumns :: [ImageColumn]
+data ImageCarousel = ImageCarousel { getColumns :: [ImageColumn]
                                    -- ^ A list of columns for an image carousel template
                                    }
                    deriving (Eq, Show)
@@ -426,9 +427,9 @@ instance ToJSON ImageCarousel where
 --
 -- It has the same fields as 'Buttons', except that the number of actions is
 -- up to 3.
-data ImageColumn = ImageColumn { getCarouselImageURL :: URL
+data ImageColumn = ImageColumn { getImageURL :: URL
                                -- ^ URL for thumbnail image
-                               , getColumnAction :: TemplateAction
+                               , getAction :: TemplateAction
                                -- ^ A template action
                                }
                  deriving (Eq, Show)
