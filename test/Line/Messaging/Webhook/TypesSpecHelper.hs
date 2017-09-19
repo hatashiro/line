@@ -30,6 +30,16 @@ goodRoom = [r|
 { "type": "room", "roomId": "789" }
 |]
 
+goodGroupWithUserId :: BL.ByteString
+goodGroupWithUserId = [r|
+{ "type": "group", "groupId": "456", "userId": "789" }
+|]
+
+goodRoomWithUserId :: BL.ByteString
+goodRoomWithUserId = [r|
+{ "type": "room", "roomId": "789", "userId": "456" }
+|]
+
 badSource :: BL.ByteString
 badSource = [r|
 { "type": "bad", "userId": "123 }

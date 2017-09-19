@@ -33,8 +33,10 @@ spec = do
 
   describe "event source" $ fromJSONSpec
     [ ( goodUser, Just $ User "123" )
-    , ( goodGroup, Just $ Group "456" )
-    , ( goodRoom, Just $ Room "789" )
+    , ( goodGroup, Just $ Group "456" Nothing)
+    , ( goodRoom, Just $ Room "789" Nothing)
+    , ( goodGroupWithUserId, Just $ Group "456" $ Just "789")
+    , ( goodRoomWithUserId, Just $ Room "789" $ Just "456")
     , ( badSource, Nothing )
     ]
 
@@ -108,7 +110,7 @@ spec = do
 
   describe "join event" $ fromJSONSpec
     [ ( goodJoin, Just $ Body $ [
-        JoinEvent ( Group "cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        JoinEvent ( Group "cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" Nothing
                   , datetime 1462629479859
                   , "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA"
                   , ()
@@ -119,7 +121,7 @@ spec = do
 
   describe "leave event" $ fromJSONSpec
     [ ( goodLeave, Just $ Body $ [
-          LeaveEvent ( Group "cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          LeaveEvent ( Group "cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" Nothing
                      , datetime 1462629479859
                      , ()
                      , ()

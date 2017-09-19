@@ -35,7 +35,6 @@ module Line.Messaging.Webhook.Types (
   getBeacon,
   -- *** Event source
   EventSource (..),
-  getID,
   -- *** Message event
   EventMessage (..),
   -- *** Beacon event
@@ -190,23 +189,17 @@ instance FromJSON Event where
 
 -- | A source from which an event is sent. It can be retrieved from events with
 -- 'getSource'.
-data EventSource = User ID
-                 | Group ID
-                 | Room ID
+data EventSource = User { userID :: ID }
+                 | Group { groupID :: ID, groupUserId :: Maybe ID }
+                 | Room { roomID :: ID, roomUserId :: Maybe ID }
                  deriving (Eq, Show)
-
--- | Retrieve identifier from event source
-getID :: EventSource -> ID
-getID (User i) = i
-getID (Group i) = i
-getID (Room i) = i
 
 instance FromJSON EventSource where
   parseJSON (Object v) = v .: "type" >>= \ t ->
     case t :: T.Text of
       "user" -> User <$> v .: "userId"
-      "group" -> Group <$> v .: "groupId"
-      "room" -> Room <$> v .: "roomId"
+      "group" -> Group <$> v .: "groupId" <*> v .:? "userId"
+      "room" -> Room <$> v .: "roomId" <*> v .:? "userId"
       _ -> fail "EventSource"
   parseJSON _ = fail "EventSource"
 
