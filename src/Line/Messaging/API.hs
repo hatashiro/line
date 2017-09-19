@@ -23,6 +23,8 @@ module Line.Messaging.API (
   getProfile,
   getGroupMemberProfile,
   getRoomMemberProfile,
+  getGroupMemberIDs,
+  getRoomMemberIDs,
   leaveRoom,
   leaveGroup,
   ) where
@@ -31,7 +33,8 @@ import Control.Exception (SomeException(..))
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Reader (runReaderT, ReaderT, ask)
 import Control.Monad.Trans.Except (runExceptT, ExceptT, throwE, catchE)
-import Data.Aeson (ToJSON(..), (.=), object, decode', eitherDecode')
+import Data.Aeson
+import Data.Maybe (fromMaybe)
 import Data.Text.Encoding (encodeUtf8)
 import Line.Messaging.API.Types
 import Line.Messaging.Types (ReplyToken)
@@ -198,8 +201,6 @@ getProfile id' = do
 
 -- | Get a profile of a user in a group, specified by the group ID and the user ID.
 --
--- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
---
 -- Please refer to <https://devdocs.line.me/en/#get-group-room-member-profile its API reference>
 -- for the difference between this API and 'getProfile'.
 getGroupMemberProfile :: ID -> ID -> APIIO Profile
@@ -212,8 +213,6 @@ getGroupMemberProfile groupId userId = do
 
 -- | Get a profile of a user in a room, specified by the room ID and the user ID.
 --
--- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
---
 -- Please refer to <https://devdocs.line.me/en/#get-group-room-member-profile its API reference>
 -- for the difference between this API and 'getProfile'.
 getRoomMemberProfile :: ID -> ID -> APIIO Profile
@@ -223,6 +222,40 @@ getRoomMemberProfile roomId userId = do
   case eitherDecode' bs of
     Right profile -> return profile
     Left errStr -> lift . throwE . JSONDecodeError $ errStr
+
+data MemberIDs = MemberIDs [ID] (Maybe ContinuationToken)
+type ContinuationToken = T.Text
+
+instance FromJSON MemberIDs where
+  parseJSON (Object v) = MemberIDs <$> v .: "memberIds" <*> v .:? "next"
+  parseJSON _ = fail "ContList"
+
+getMemberIDs :: String -> Maybe T.Text -> ID -> APIIO [ID]
+getMemberIDs base token id' = do
+  let url = base ++ T.unpack id' ++ "/members/ids" ++ fromMaybe "" (("?start=" ++) . T.unpack <$> token)
+  bs <- get url
+  case eitherDecode' bs of
+    Right (MemberIDs ids Nothing) -> return ids
+    Right (MemberIDs ids token') -> (ids ++) <$> getMemberIDs base token' id'
+    Left errStr -> lift . throwE . JSONDecodeError $ errStr
+
+-- | Gets the user profile of a member of a group that the bot is in.
+--
+-- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#get-group-room-member-ids its API reference>.
+getGroupMemberIDs :: ID -> APIIO [ID]
+getGroupMemberIDs = getMemberIDs "https://api.line.me/v2/bot/group/" Nothing
+
+-- | Gets the user profile of a member of a room that the bot is in.
+--
+-- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
+--
+-- For more information, please refer to
+-- <https://devdocs.line.me/en/#get-group-room-member-ids its API reference>.
+getRoomMemberIDs :: ID -> APIIO [ID]
+getRoomMemberIDs = getMemberIDs "https://api.line.me/v2/bot/room/" Nothing
 
 leave :: String -> ID -> APIIO ()
 leave type' id' = do
