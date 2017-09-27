@@ -23,7 +23,7 @@ description:
   .
   * Webhook handled with handler function, WAI application, or Scotty action
   .
-  * Functions and types for <https://devdocs.line.me/en/#messaging-api LINE Messaging API>
+  * Functions and types for <https://developers.line.me/en/docs/messaging-api/reference/>
   .
   For example usages, please see the
   <https://github.com/utatti/line/tree/master/examples examples> directory.

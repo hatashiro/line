@@ -21,7 +21,7 @@ import qualified Data.ByteString.Lazy as BL
 -- valid LINE server.
 --
 -- For more details of webhook authentication, please refer to
--- <https://devdocs.line.me/en/#webhook-authentication the LINE documentation>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#signature-validation the LINE documentation>.
 validateSignature :: ChannelSecret -> BL.ByteString -> Signature -> Bool
 validateSignature secret body signature = hash == signature
   where hash = Base64.encode $ hmaclazy (encodeUtf8 secret) body

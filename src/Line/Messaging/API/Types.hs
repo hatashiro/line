@@ -65,7 +65,7 @@ import qualified Data.ByteString.Lazy as BL
 --
 -- About existing messageable types, please refer to the following instances.
 -- Each instance is matched with a message object described in
--- <https://devdocs.line.me/en/#send-message-object the LINE documentation>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#message-objects the LINE documentation>.
 class Messageable a where
   toType :: a -> T.Text
   toObject :: a -> [Pair]
@@ -97,7 +97,7 @@ instance ToJSON Message where
 -- | 'Messageable' for text data.
 --
 -- It contains 'T.Text' of "Data.Text". Its corresponding JSON spec is described
--- <https://devdocs.line.me/en/#text here>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#text here>.
 --
 -- This type is also used to decode text event message from webhook request.
 -- About the webhook usage, please refer to
@@ -118,7 +118,7 @@ instance Messageable Text where
 -- | 'Messageable' for image data.
 --
 -- It contains URLs of an original image and its preview. Its corresponding JSON
--- spec is described <https://devdocs.line.me/en/#image here>.
+-- spec is described <https://developers.line.me/en/docs/messaging-api/reference/#image here>.
 data Image = Image { getURL :: URL
                    , getPreviewURL :: URL
                    }
@@ -133,7 +133,7 @@ instance Messageable Image where
 -- | 'Messageable' for video data.
 --
 -- It contains URLs of an original video and its preview. Its corresponding JSON
--- spec is described <https://devdocs.line.me/en/#video here>.
+-- spec is described <https://developers.line.me/en/docs/messaging-api/reference/#video here>.
 data Video = Video { getURL :: URL
                    , getPreviewURL :: URL
                    }
@@ -149,7 +149,7 @@ instance Messageable Video where
 --
 -- It contains a URL of an audio, and its duration in milliseconds. Its
 -- corresponding JSON spec is described
--- <https://devdocs.line.me/en/#audio here>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#audio here>.
 data Audio = Audio { getURL :: URL
                    , getDuration :: Integer
                    }
@@ -165,7 +165,7 @@ instance Messageable Audio where
 --
 -- It contains a title, address, and geographic coordination of a location.
 -- Its corresponding JSON spec is described
--- <https://devdocs.line.me/en/#location here>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#location here>.
 --
 -- This type is also used to decode location event message from webhook request.
 -- About the webhook usage, please refer to
@@ -196,7 +196,7 @@ instance Messageable Location where
 -- | 'Messageable' for sticker data.
 --
 -- It contains its package and sticker ID.  Its corresponding JSON spec is
--- described <https://devdocs.line.me/en/#sticker here>.
+-- described <https://developers.line.me/en/docs/messaging-api/reference/#sticker here>.
 --
 -- This type is also used to decode sticker event message from webhook request.
 -- About the webhook usage, please refer to
@@ -222,9 +222,9 @@ instance Messageable Sticker where
 --
 -- About how to send an image map message and what each field means, please
 -- refer to
--- <https://devdocs.line.me/en/#imagemap-message image map message spec>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#imagemap-message image map message spec>.
 data ImageMap = ImageMap { getBaseImageURL :: URL
-                           -- ^ <https://devdocs.line.me/en/#base-url Base URL> of images
+                           -- ^ <https://developers.line.me/en/docs/messaging-api/reference/#base-url Base URL> of images
                          , getAltText :: T.Text
                            -- ^ Alt text for devices not supporting image map
                          , getBaseImageSize :: (Integer, Integer)
@@ -281,7 +281,7 @@ toAreaJSON (x, y, w, h) = object [ "x" .= x, "y" .= y, "width" .= w, "height" .=
 --
 -- About how to send template message and what each field means, please
 -- refer to
--- <https://devdocs.line.me/en/#template-messages template message spec>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#template-messages template message spec>.
 data Template t = Template { getAltText :: T.Text
                              -- ^ Alt text for devices not supporting template message
                            , getTemplateContent :: t
@@ -315,10 +315,10 @@ instance Messageable (Template ImageCarousel) where
 
 -- | The buttons content type for template message.
 --
--- <<https://devdocs.line.me/images/buttons.png Buttons template>>
+-- <<https://developers.line.me/media/messaging-api/messages/buttons.png Buttons template>>
 --
 -- For more details of each field, please refer to the
--- <https://devdocs.line.me/en/#buttons Buttons> section in the LINE
+-- <https://developers.line.me/en/docs/messaging-api/reference/#buttons Buttons> section in the LINE
 -- documentation.
 data Buttons = Buttons { getThumbnailURL :: Maybe URL
                        -- ^ URL for thumbnail image
@@ -345,10 +345,10 @@ instance ToJSON Buttons where
 
 -- | The confirm content type for template message.
 --
--- <<https://devdocs.line.me/images/confirm.png Confirm template>>
+-- <<https://developers.line.me/media/messaging-api/messages/confirm.png Confirm template>>
 --
 -- For more details of each field, please refer to the
--- <https://devdocs.line.me/en/#confirm Confirm> section in the LINE
+-- <https://developers.line.me/en/docs/messaging-api/reference/#confirm Confirm> section in the LINE
 -- documentation.
 data Confirm = Confirm { getText :: T.Text
                        -- ^ Confirm text
@@ -366,10 +366,10 @@ instance ToJSON Confirm where
 
 -- | The carousel content type for template message.
 --
--- <<https://devdocs.line.me/images/carousel.png Carousel template>>
+-- <<https://developers.line.me/media/messaging-api/messages/carousel.png Carousel template>>
 --
 -- For more details of each field, please refer to the
--- <https://devdocs.line.me/en/#carousel Carousel> section in the LINE
+-- <https://developers.line.me/en/docs/messaging-api/reference/#carousel Carousel> section in the LINE
 -- documentation.
 data Carousel = Carousel { getColumns :: [Column]
                          -- ^ A list of columns for a carousel template
@@ -409,10 +409,10 @@ instance ToJSON Column where
 
 -- | The image carousel content type for template message.
 --
--- <<https://devdocs.line.me/images/image_carousel.png Image carousel template>>
+-- <<https://developers.line.me/media/messaging-api/messages/image-carousel.png Image carousel template>>
 --
 -- For more details of each field, please refer to the
--- <https://devdocs.line.me/en/#image-carousel Image carousel> section in the LINE
+-- <https://developers.line.me/en/docs/messaging-api/reference/#image-carousel Image carousel> section in the LINE
 -- documentation.
 data ImageCarousel = ImageCarousel { getColumns :: [ImageColumn]
                                    -- ^ A list of columns for an image carousel template
@@ -470,7 +470,7 @@ data TemplateAction = TplMessageAction Label T.Text
                       -- will be sent with the date and time selected by the
                       -- user from the date and time selection dialog. For the
                       -- detailed information of datetime picker, please refer
-                      -- to the <https://devdocs.line.me/en/#datetime-picker-action official documentation>.
+                      -- to the <https://developers.line.me/en/docs/messaging-api/reference/#datetime-picker-action official documentation>.
                     deriving (Eq, Show)
 
 instance ToJSON TemplateAction where
@@ -533,8 +533,8 @@ instance FromJSON Profile where
 -- which may rarely occur if used properly, does not.
 --
 -- For more details of error types, please refer to
--- <https://devdocs.line.me/en/#status-codes Status codes> and
--- <https://devdocs.line.me/en/#error-response Error response> sections in the
+-- <https://developers.line.me/en/docs/messaging-api/reference/#status-codes Status codes> and
+-- <https://developers.line.me/en/docs/messaging-api/reference/#error-responses Error response> sections in the
 -- LINE documentation.
 data APIError = BadRequest (Maybe APIErrorBody)
               -- ^ 400 Bad Request with a parsed error body, caused by badly
@@ -547,7 +547,7 @@ data APIError = BadRequest (Maybe APIErrorBody)
               -- unauthorized account or plan.
               | TooManyRequests (Maybe APIErrorBody)
               -- ^ 429 Too Many Requests with a parsed error body, caused by
-              -- exceeding the <https://devdocs.line.me/en/#rate-limits rate limit>.
+              -- exceeding the <https://developers.line.me/en/docs/messaging-api/reference/#rate-limits rate limit>.
               | InternalServerError (Maybe APIErrorBody)
               -- ^ 500 Internal Server Error with a parsed error body.
               | UndefinedStatusCode Int BL.ByteString

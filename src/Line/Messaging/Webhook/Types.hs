@@ -21,7 +21,7 @@ module Line.Messaging.Webhook.Types (
   -- (e.g. 'FromJSON') are implemented here.
   --
   -- For the event spec, please refer to
-  -- <https://devdocs.line.me/en/#webhook-event-object the LINE documentation>.
+  -- <https://developers.line.me/en/docs/messaging-api/reference/#webhook-event-objects the LINE documentation>.
   Event (..),
   EventTuple,
   ReplyToken,
@@ -214,7 +214,7 @@ instance FromJSON EventSource where
 -- @<./Line-Messaging-API.html#v:getContent getContent>@ API.
 --
 -- For more details of event messages, please refer to the
--- <https://devdocs.line.me/en/#message-event Message event> section of the LINE
+-- <https://developers.line.me/en/docs/messaging-api/reference/#message-event Message event> section of the LINE
 -- documentation.
 data EventMessage = TextEM ID Text -- ^ Text event message.
                   | ImageEM ID -- ^ Image event message.
@@ -252,7 +252,7 @@ instance FromJSON Postback where
 -- | Represent params of Postback data.
 --
 -- It's currently used only for the datetime picker action. For the detail,
--- please refer to the <https://devdocs.line.me/en/#postback-params-object official documentation>.
+-- please refer to the <https://developers.line.me/en/docs/messaging-api/reference/#postback-params-object official documentation>.
 data PostbackParams = PostbackParamsDate T.Text
                     | PostbackParamsTime T.Text
                     | PostbackParamsDatetime T.Text

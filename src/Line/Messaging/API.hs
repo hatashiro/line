@@ -3,7 +3,7 @@ This module provides functions corresponding to the LINE Messaging APIs, nearly
 one on one.
 
 For more details about the APIs themselves, please refer to the
-<https://devdocs.line.me/en/#messaging-api API references>.
+<https://developers.line.me/en/docs/messaging-api/reference/ API references>.
 -}
 
 module Line.Messaging.API (
@@ -111,7 +111,7 @@ post url body = setRequestBodyJSON body <$> createReq "POST" url >>= runReq
 -- a group, specified by 'ID'.
 --
 -- A 'Message' represents a message object. For types of the message object,
--- please refer to the <https://devdocs.line.me/en/#send-message-object Send message object>
+-- please refer to the <https://developers.line.me/en/docs/messaging-api/reference/#message-objects Send message object>
 -- section of the LINE documentation.
 --
 -- An example usage of 'Message' is like below:
@@ -129,7 +129,7 @@ post url body = setRequestBodyJSON body <$> createReq "POST" url >>= runReq
 -- @
 --
 -- For more information about the API, please refer to
--- <https://devdocs.line.me/en/#push-message the API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#send-push-message the API reference>.
 push :: ID -> [Message] -> APIIO ()
 push id' ms = do
   let url = "https://api.line.me/v2/bot/message/push"
@@ -143,7 +143,7 @@ push id' ms = do
 -- Messages cannot be sent to groups or rooms.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#multicast its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#send-multicast-messages its API reference>.
 multicast :: [ID] -> [Message] -> APIIO ()
 multicast ids ms = do
   let url = "https://api.line.me/v2/bot/message/multicast"
@@ -159,7 +159,7 @@ multicast ids ms = do
 -- <./Line-Messaging-Webhook-Types.html#t:ReplyableEvent replyable events> on a webhook server.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#reply-message its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#send-reply-message its API reference>.
 reply :: ReplyToken -> [Message] -> APIIO ()
 reply replyToken ms = do
   let url = "https://api.line.me/v2/bot/message/reply"
@@ -176,7 +176,7 @@ reply replyToken ms = do
 -- 'getContent' to downloaded the content only when it is really needed.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#get-content its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#get-content its API reference>.
 getContent :: ID -> APIIO BL.ByteString
 getContent id' = do
   let url = concat [ "https://api.line.me/v2/bot/message/"
@@ -190,7 +190,7 @@ getContent id' = do
 -- The user identifier can be obtained via <./Line-Messaging-Webhook-Types.html#t:EventSource EventSource>.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#bot-api-get-profile its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#get-profile its API reference>.
 getProfile :: ID -> APIIO Profile
 getProfile id' = do
   let url = "https://api.line.me/v2/bot/profile/" ++ T.unpack id'
@@ -201,7 +201,7 @@ getProfile id' = do
 
 -- | Get a profile of a user in a group, specified by the group ID and the user ID.
 --
--- Please refer to <https://devdocs.line.me/en/#get-group-room-member-profile its API reference>
+-- Please refer to <https://developers.line.me/en/docs/messaging-api/reference/#get-group-member-profile its API reference>
 -- for the difference between this API and 'getProfile'.
 getGroupMemberProfile :: ID -> ID -> APIIO Profile
 getGroupMemberProfile groupId userId = do
@@ -213,7 +213,7 @@ getGroupMemberProfile groupId userId = do
 
 -- | Get a profile of a user in a room, specified by the room ID and the user ID.
 --
--- Please refer to <https://devdocs.line.me/en/#get-group-room-member-profile its API reference>
+-- Please refer to <https://developers.line.me/en/docs/messaging-api/reference/#get-room-member-profile its API reference>
 -- for the difference between this API and 'getProfile'.
 getRoomMemberProfile :: ID -> ID -> APIIO Profile
 getRoomMemberProfile roomId userId = do
@@ -244,7 +244,7 @@ getMemberIDs base token id' = do
 -- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#get-group-room-member-ids its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#get-group-member-user-ids its API reference>.
 getGroupMemberIDs :: ID -> APIIO [ID]
 getGroupMemberIDs = getMemberIDs "https://api.line.me/v2/bot/group/" Nothing
 
@@ -253,7 +253,7 @@ getGroupMemberIDs = getMemberIDs "https://api.line.me/v2/bot/group/" Nothing
 -- FYI: This feature is only available for LINE@ Approved accounts or official accounts.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#get-group-room-member-ids its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#get-room-member-user-ids its API reference>.
 getRoomMemberIDs :: ID -> APIIO [ID]
 getRoomMemberIDs = getMemberIDs "https://api.line.me/v2/bot/room/" Nothing
 
@@ -271,13 +271,13 @@ leave type' id' = do
 -- | Leave a room, specified by @'ID'@.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#leave its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#leave-room its API reference>.
 leaveRoom :: ID -> APIIO ()
 leaveRoom = leave "room"
 
 -- | Leave a group, specified by @'ID'@.
 --
 -- For more information, please refer to
--- <https://devdocs.line.me/en/#leave its API reference>.
+-- <https://developers.line.me/en/docs/messaging-api/reference/#leave-group its API reference>.
 leaveGroup :: ID -> APIIO ()
 leaveGroup = leave "group"
