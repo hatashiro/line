@@ -1,3 +1,7 @@
+## 4.0.1 (27 Sep 2017)
+
+* Update documentation links
+
 ## 4.0.0 (19 Sep 2017)
 
 * Use the latest Stack resolver 9.5

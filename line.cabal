@@ -1,5 +1,5 @@
 name:                line
-version:             4.0.0
+version:             4.0.1
 synopsis:            Haskell SDK for the LINE API
 homepage:            https://github.com/utatti/line
 license:             BSD3
