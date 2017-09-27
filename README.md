@@ -1,4 +1,4 @@
-# line [!['travis-ci/noraesae/line](https://travis-ci.org/noraesae/line.svg?branch=master)](https://travis-ci.org/noraesae/line)
+# line [!['travis-ci/utatti/line](https://travis-ci.org/utatti/line.svg?branch=master)](https://travis-ci.org/utatti/line)
 
 Haskell SDK for the [LINE](https://line.me) API
 

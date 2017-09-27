@@ -1,7 +1,7 @@
 name:                line
 version:             4.0.0
 synopsis:            Haskell SDK for the LINE API
-homepage:            https://github.com/noraesae/line
+homepage:            https://github.com/utatti/line
 license:             BSD3
 license-file:        LICENSE
 author:              Jun
@@ -26,7 +26,7 @@ description:
   * Functions and types for <https://devdocs.line.me/en/#messaging-api LINE Messaging API>
   .
   For example usages, please see the
-  <https://github.com/noraesae/line/tree/master/examples examples> directory.
+  <https://github.com/utatti/line/tree/master/examples examples> directory.
 
 library
   hs-source-dirs:      src
@@ -85,4 +85,4 @@ test-suite line-test
 
 source-repository head
   type:     git
-  location: https://github.com/noraesae/line
+  location: https://github.com/utatti/line
